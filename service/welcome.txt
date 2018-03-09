@@ -1,0 +1,18 @@
+<html>
+<head>
+  <title>Tango Festival Bonn Registration Service</title>
+</head>
+<body>
+<h2>Welcome to our Festival</h2>
+  <p>You are now registered as an artist at the Tango Festival Bonn.
+    <br>Please use this link to get access to your data that we have put in so far. It would be nice, if you would complete your profile.
+    You will find all information around the event that are relevant for you and us at this site. So please check it out frequently.
+    Nevertheless, if there is something important for you to note, we will send you an email (currently we don't have a notification service available).
+  </p>
+    The closer we get to the event date the more information we need from you, like e.g. flight numbers, arrivals, departures, any changes.
+    Please keep the information up to date as we will do as well.
+      <a href='http://vip-registration.tangofestival-bonn.de/<id>'>http://vip-registration.tangofestival-bonn.de/<id></a>
+    <br>The link simply contains your id: <id> at the end.
+    <p>Best,<br>Tangofestival Bonn Organization Team</p>
+</body>
+</html>

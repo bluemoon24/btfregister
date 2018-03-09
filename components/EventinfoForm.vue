@@ -1,0 +1,294 @@
+<template>
+  <div>
+    <v-flex xs6>
+    <v-text-field
+      v-model="name"
+      @blur="changeEvent"
+      label="Name"
+    />
+  </v-flex>
+    <v-flex xs6>
+      <v-select
+        ref="type"
+        :items="[
+          {text: 'Milonga', value: 'milonga'},
+          {text: 'Workshop', value: 'workshop'},
+          {text: 'Performance (Show, Concert)', value: 'performance'},
+          {text: 'Pickup', value: 'pickup'}]"
+          @input="changeEvent"
+        v-model="selectedType"
+        label="Event type"
+      ></v-select>
+    </v-flex>
+
+    <v-flex xs6>
+    <v-select
+       ref="loc"
+       :items="locations"
+       @input="changeEvent"
+       v-model="selectedLocId"
+       item-text="name"
+       item-value="id"
+       label="Select location"
+     ></v-select>
+     <v-btn flat small color="primary" >New</v-btn>
+   </v-flex>
+
+    <v-divider />
+
+    <v-layout row wrap>
+      <v-flex d-flex>
+          <v-layout column>
+              <v-container>
+                <v-layout row wrap>
+
+                  <v-text-field
+                    v-model="start_datime"
+                    @blur="changeEvent"
+                    label="Start"
+                    :prepend-icon-cb="openStartDialog"
+                    prepend-icon="event"
+                    :rules="[datimerule]"
+                  />
+                  <!-- <v-text-field
+                    v-model="start_time"
+                    @blur="changeEvent"
+                    :prepend-icon-cb="openStartDialog"
+                    prepend-icon="schedule"
+                    :rules="[timerule]"
+                  /> -->
+
+                  <v-dialog v-model="showStartPicker" max-width='350px'>
+                    <date-time-picker :date="psdate" :time="pstime" v-on:datime="startDateEvent"/>
+                  </v-dialog>
+
+                </v-layout>
+            </v-container>
+        </v-layout>
+    </v-flex>
+
+      <v-flex d-flex>
+          <v-layout column>
+              <v-container>
+                <v-layout row wrap>
+
+                  <v-text-field
+                    v-model="end_datime"
+                    @blur="changeEvent"
+                    label="End"
+                    :prepend-icon-cb="openEndDialog"
+                    prepend-icon="event"
+                    :rules="[datimerule]"
+                  />
+                    <!-- <v-text-field
+                      v-model="end_time"
+                      :prepend-icon-cb="openEndDialog"
+                      prepend-icon="schedule"
+                      :rules="[timerule]"
+                    /> -->
+
+                    <v-dialog v-model="showEndPicker" max-width='800px'>
+                      <date-time-picker :date="pedate" :time="petime" v-on:datime="endDateEvent"/>
+                    </v-dialog>
+
+              </v-layout>
+            </v-container>
+          </v-layout>
+      </v-flex>
+
+      <v-flex xs12 sm6>
+          <v-select
+            label="Involved"
+            multiple
+            :items="parties"
+            v-model="involved"
+            @input="changeEvent"
+          ></v-select>
+        </v-flex>
+
+    </v-layout>
+  </div>
+</template>
+
+<script>
+  import MapDialog from '~/components/MapDialog.vue'
+  import DateTimePicker from '~/components/DateTimePicker.vue'
+  import { Eventinfo, Util } from '~/components/Classes.js'
+
+  export default {
+    name: 'eventinfo-form',
+    components: {
+      MapDialog, DateTimePicker
+    },
+    props: {
+      eventinfo: {
+        type: Object
+      },
+      locations: {
+        type: Array
+      }
+    },
+    watch: {
+      'eventinfo': {
+        handler: 'update',
+        deep: true
+      },
+      'eventinfo.location': {
+        handler: 'update',
+        deep: true
+      }
+    },
+
+    async fetch ({ store }) {
+      console.log('fetch eventlocation', this.eventinfo.id)
+      // if (!Array.isArray(this.$store.state.locationData || this.$store.state.locationData.length <= 0)) this.$store.dispatch('getLocationData')
+      // await store.dispatch('getEventLocation', this.eventinfo.id)
+      console.log('**EventId', this.eventinfo)
+    },
+
+    mounted: function () {
+      this.update()
+    },
+    data: () => {
+      return {
+        showStartPicker: false,
+        showEndPicker: false,
+        start_datime: '2018-04-26 12:00',
+        start_date: '2018-04-26',
+        start_time: '12:00',
+        end_datime: '2018-05-01 02:00',
+        end_date: '2018-05-01',
+        end_time: '01:30',
+        psdate: '2018-04-26',
+        pstime: '12:00',
+        pedate: '2018-05-01',
+        petime: '01:30',
+        name: '',
+        selectedType: '',
+        selectedLocId: 0,
+        involved: [],
+        involved1: ['a', 'b'],
+        location: {}
+      }
+    },
+    computed: {
+      locs: function () {
+        let locs = this.locations.map((loc) => ({ text: loc.name, value: loc.id }))
+        return locs
+      },
+      parties: function () {
+        let list = this.$store.state.uids
+        return list.map((p) => ({ text: p.name, value: p.id }))
+      }
+    },
+
+    methods: {
+      changeEvent: function (newval) {
+        let ev = new Eventinfo(this.eventinfo)
+        ev.type = this.selectedType
+        // ev.location = this.selectedLoc
+        ev.starts = this.start_datime.replace(/\s/, 'T')
+        ev.ends = this.end_datime.replace(/\s/, 'T')
+        ev.name = this.name
+        ev.involved = this.$store.state.uids.filter((e) => (this.involved.includes(e.id)))
+        console.log('submit ev', ev)
+        this.$emit('update:eventinfo', ev)
+        // this.$emit('update:type', tnew)
+      },
+      formatDateTime: function (date) {
+        let [y, m, d, h, min] = [date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes()]
+        d = (d < 9 ? '0' : '') + d
+        m = (m < 9 ? '0' : '') + m
+        h = (h < 9 ? '0' : '') + h
+        min = (min < 9 ? '0' : '') + min
+        // let (h, min, s) = date.toLocaleTimeString().split(':')
+        let result
+        result.date = [y, m, d].join('-')
+        result.time = [h, min].join(':')
+        result.datetime = [result.date, result.time].join('T')
+        return result
+      },
+      update: function () {
+        console.log('EventinfoForm mounted/updated', this.eventinfo)
+        // console.log('json of array', this.eventinfo.involved)
+        // console.log('involved', this.eventinfo.involved, Array.isArray(this.eventinfo.involved), typeof this.eventinfo.involved)
+        this.selectedLocId = this.eventinfo && this.eventinfo.location ? this.eventinfo.location.id : -1
+        // console.log('locs', this.locs, '>', this.eventinfo.location, '>', this.selectedLocId)
+        // this.selectedLoc = this.eventinfo ? this.eventinfo.location : this.selectedLoc
+        this.selectedType = this.eventinfo ? this.eventinfo.type : this.selectedType
+        this.name = this.eventinfo ? this.eventinfo.name : this.name
+        this.start_datime = this.eventinfo ? this.eventinfo.starts : this.start_datime
+        this.end_datime = this.eventinfo ? this.eventinfo.ends : this.end_datime
+        this.start_datime = this.start_datime.replace('T', ' ')
+        this.end_datime = this.end_datime.replace('T', ' ')
+        let involved = this.eventinfo && Array.isArray(this.eventinfo.involved) ? this.eventinfo.involved : this.involved
+        this.involved = involved.map((e) => (e.id || ''))
+        console.log('****  involved', involved)
+        console.log('****  involved 2', this.involved)
+        console.log('****  involved 3', this.eventinfo.involved)
+        let ds = new Date(this.eventinfo ? this.eventinfo.starts : this.start_date)
+        // console.log('ds is ', ds, this.eventinfo.starts)
+        // let [d, m, y] = ds.toLocaleDateString().split('.')
+        this.start_date = Util.formatDateTime(ds).date
+        // this.start_date = ds.toISOString().split('T')[0]
+        // console.log('start_date', this.start_date)
+        this.start_time =
+          (ds.getHours() > 9 ? '' : '0') + ds.getHours() +
+          (ds.getMinutes() > 9 ? ':' : ':0') + ds.getMinutes()
+        let de = new Date(this.eventinfo ? this.eventinfo.ends : this.end_date)
+        this.end_date = Util.formatDateTime(de).date // de.toISOString().split('T')[0]
+        // console.log('end_date', this.end_date)
+        this.end_time =
+          (de.getHours() > 9 ? '' : '0') + de.getHours() +
+          (de.getMinutes() > 9 ? ':' : ':0') + de.getMinutes()
+        this.psdate = this.start_date
+        this.pstime = this.start_time
+        this.pedate = this.end_date
+        this.petime = this.end_time
+      },
+      timerule: (value) => (/^$|^([01]?[0-9]|2[0-3]):(00|15|30|45)$/.test(value) || 'Invalid time format (hh:00, hh:15, ...)'),
+      daterule: (value) => {
+        return Util.isValidDate(value) || 'Invalid date'
+      },
+      datimerule: (value) => {
+        const pat = /^$|^([01]?[0-9]|2[0-3]):([0-5][0-9])$/
+        let [d, t] = value.split(/\s/)
+        if (!t) t = ''
+        return (Util.isValidDate(d) && pat.test(t)) || 'Invalid date or time'
+      },
+      startDateEvent: function (e) {
+        console.log('startDateEvent', e)
+        if (e.type === 'save') {
+          this.start_date = e.payload.date
+          this.start_time = e.payload.time
+          this.start_datime = e.payload.datime
+          this.changeEvent()
+        }
+        this.showStartPicker = false
+      },
+      endDateEvent: function (e) {
+        console.log('endDateEvent', e)
+        if (e.type === 'save') {
+          this.end_date = e.payload.date
+          // this.end_time = e.payload.time
+          this.changeEvent()
+        }
+        this.showEndPicker = false
+      },
+      openStartDialog: function () {
+        [this.psdate, this.pstime] = this.start_datime.split(/\s/)
+        // this.pstime = this.start_time
+        this.showStartPicker = true
+      },
+      openEndDialog: function () {
+        [this.pedate, this.petime] = this.end_datime.split(/\s/)
+        // this.petime = this.end_time
+        this.showEndPicker = true
+      }
+    }
+  }
+</script>
+
+<style scoped>
+
+</style>

@@ -1,0 +1,18 @@
+"id","name","email","url","manager","role","pix","press","arrival","departure","eventinfo","mobile","postaladdress","membersxxx","social","privileged"
+"65286","Bandonegro","info@bandonegro.com","http://bandonegro.com","Michał Główka","musician",,,"0000-00-00 00:00:00","0000-00-00 00:00:00",,,,"[]",,"0"
+"63021","Organizers","info@tangofestival-bonn.de","http://bonntango.de","Lothar 2","other",,,"0000-00-00 00:00:00","0000-00-00 00:00:00","""""","49 152 21523315","Harald Rotter
+Am Woltersweiher 32
+53175 Bonn","[{""name"":""Lothar Burow"",""role"":"""",""isManager"":false},{""name"":""Harald Rotter"",""role"":"""",""isManager"":false},{""name"":""Susanne Illini"",""role"":"""",""isManager"":false}]","[""facebook.com/bonnertangofestival"",""https://www.youtube.com/channel/UCYWmjsN4gUH2a-NWhcAnYpg""]","1"
+"45080","lothar","lothar@b-welcome.de",,"Lothar",,,,"0000-00-00 00:00:00","0000-00-00 00:00:00",,,,,,"0"
+"91511","Harald und Susanne","susanne@tangobuehne.de","http://tangobuehne.de","Susanne Illini","dancer",,,NULL,NULL,,"+49 152 21523315","Frau
+Susanne Illini
+
+Dollendorfer Allee 18
+D-53227 Bonn","[""Susanne Illini"",""Harald Rotter""]",,"0"
+"45488","lothar","info@hugo.de",,"hugo","dancer",,,NULL,NULL,,,,"[]",,"0"
+"75070","ID_75070",,,,,,,"0000-00-00 00:00:00","0000-00-00 00:00:00","""""",,,"[]","[]","0"
+"83835","New Artist","new@x.de",,,,,,NULL,NULL,,"777","xxxx",,,"0"
+"43292","Tanguerilla","tanguerilla@me.com","http://tanguerilla.de",,"dj",,,NULL,NULL,,"49 151 12725906","Volker Marschhausen
+Wachmannstr. 157
+28209 Bremen","[]",,"0"
+"78312","Duo Ranas",,,,"musician",,,NULL,NULL,,,,,,"0"

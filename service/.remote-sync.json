@@ -1,0 +1,19 @@
+{
+  "logger": {
+    "title": "Remote Sync"
+  },
+  "uploadOnSave": true,
+  "useAtomicWrites": false,
+  "deleteLocal": false,
+  "hostname": "home67390146.1and1-data.host",
+  "port": "22",
+  "target": "/festival/registration/service",
+  "ignore": [
+    ".remote-sync.json",
+    ".git/**"
+  ],
+  "username": "p33791050",
+  "password": "oo7-MeY-cLR-YQZ",
+  "watch": [],
+  "transport": "scp"
+}
