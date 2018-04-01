@@ -21,6 +21,14 @@
         label="phone"
         v-model="location.phone"
       />
+        <v-select
+        :items="[
+        {text: 'Accomodation', value: 'accomodation'},
+        {text: 'Event/Workshop', value: 'event'},
+        {text: 'Other', value: 'other'}]"
+        v-model="location.type"
+        label="Location type"
+        ></v-select>
   </v-form>
   </div>
 </template>

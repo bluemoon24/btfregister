@@ -166,7 +166,7 @@ export class Eventinfo {
 
 export class Location {
   constructor (data = null) {
-    clone(this, data, ['id', 'name', 'address', 'placeid', 'phone'])
+    clone(this, data, ['id', 'name', 'address', 'placeid', 'phone', 'type'])
     return this
   }
   toNeoProps (lvar = 'l') {

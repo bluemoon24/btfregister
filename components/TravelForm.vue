@@ -89,8 +89,8 @@
       <v-divider />
 
       <v-flex xs12 md6>
-      <v-select
-         :items="$store.state.locationData"
+      <v-select v-if="travelby === 'car'"
+         :items="$store.state.locationData.filter(e => e.type === 'accomodation')"
          v-model="selected"
          item-text="name"
          item-value="id"
@@ -221,9 +221,17 @@
       //   this.address.split(/\s/m).join('+')
       // },
       changeTravelBy: function (val) {
-        if (val === 'plane') this.arrivalat = 'cgn'
-        else if (val === 'car') this.arrivalat = 'accomodation'
-        else if (val === 'train' && !['su', 'k', 'bn'].some(e => (e === this.arrivalat))) this.arrivalat = 'bn'
+        switch (val) {
+          case 'plane':
+            this.arrivalat = 'cgn'
+            // this.selected = this.$store.state.locationData.find(e => e.id === '9')
+            break
+          case 'car':
+            this.arrivalat = 'accomodation'
+            break
+          case 'train':
+            if (!['su', 'k', 'bn'].some(e => (e === this.arrivalat))) this.arrivalat = 'bn'
+        }
       },
       handleListEvents: function (e) {
         console.log('listevent')
