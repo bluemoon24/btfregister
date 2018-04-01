@@ -131,10 +131,12 @@ export class Eventinfo {
         type: '',
         starts: '2018-04-27T15:00',
         ends: '2018-05-01T01:00',
-        involved: []
+        involved: [],
+        evtdescription: '',
+        level: 'medium'
       }
     }
-    clone(this, data, ['id', 'name', 'type', 'starts', 'ends', 'location', 'involved', 'key'])
+    clone(this, data, ['id', 'name', 'type', 'level', 'starts', 'ends', 'location', 'involved', 'key', 'evtdescription'])
     console.log('Eventinfo constructor cloned', this)
     return this
   }

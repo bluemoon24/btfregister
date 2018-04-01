@@ -30,7 +30,7 @@
             ]"
            v-model="filteredDays"
            multiple
-           hint="What are the target regions"
+           hint="Filter a weekday"
            persistent-hint
          ></v-select>
        </v-flex>

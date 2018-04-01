@@ -1,121 +1,161 @@
 <template>
   <div>
-    <v-flex xs6>
-    <v-text-field
-      v-model="name"
-      @input="changeName"
-      label="Name"
-    />
-  </v-flex>
-    <v-flex xs6>
-      <v-select
-        ref="type"
-        :items="[
+    <v-layout row wrap>
+      <!-- <v-flex xs12> -->
+      <v-flex >
+        <v-flex >
+          <v-text-field
+          v-model="name"
+          @input="changeName"
+          label="Name"
+          />
+        </v-flex>
+
+        <!-- <v-container fluid> -->
+        <v-flex >
+          <v-select
+          ref="type"
+          :items="[
           {text: 'Milonga', value: 'milonga'},
           {text: 'Workshop', value: 'workshop'},
           {text: 'Performance (Show, Concert)', value: 'performance'},
           {text: 'Travel and Transport', value: 'tnt'}]"
           @input="changeType"
-        v-model="selectedType"
-        label="Event type"
-      ></v-select>
-    </v-flex>
+          v-model="selectedType"
+          label="Event type"
+          ></v-select>
+        </v-flex>
 
-    <v-flex xs6>
-    <v-select
-       ref="loc"
-       :items="locations"
-       @input="changeLocation"
-       v-model="selectedLocId"
-       item-text="name"
-       item-value="id"
-       :label="selectedType === 'tnt' ? 'Select pickup location' : 'Select target location'"
-     ></v-select>
-     <v-select v-if="selectedType === 'tnt'"
+        <v-flex>
+          <v-select v-if="selectedType === 'workshop'"
+          ref="type"
+          :items="[
+          {text: 'Beginner', value: 'beginner'},
+          {text: 'Medium', value: 'medium'},
+          {text: 'Advanced', value: 'advanced'},
+          {text: 'Very Advanced', value: 'veryadvanced'}]"
+          @input="changeLevel"
+          v-model="level"
+          label="Level"
+          ></v-select>
+        </v-flex>
+
+      <v-flex >
+        <v-select
+        ref="loc"
+        :items="locations"
+        @input="changeLocation"
+        v-model="selectedLocId"
+        item-text="name"
+        item-value="id"
+        :label="selectedType === 'tnt' ? 'Pickup location' : 'Target location'"
+        ></v-select>
+        <v-select v-if="selectedType === 'tnt'"
         ref="loc"
         :items="locations"
         v-model="selectedLocId2"
         item-text="name"
         item-value="id"
         label="Select target location"
-      ></v-select>
-     <!-- <v-btn flat small color="primary" >New</v-btn> -->
-   </v-flex>
+        ></v-select>
+        <!-- <v-btn flat small color="primary" >New</v-btn> -->
+      </v-flex>
+    </v-flex>
+    <!-- </v-container> -->
+    <v-flex xs6 class="mt-0">
+      <v-card height="100%">
+        <!-- <v-card-title><h2></h2></v-card-title> -->
+        <v-card-text >
+          Event evtdescription
+          <v-text-field
+          height="100%"
+          class="mt-0"
+          hide-details
+          editable
+          textarea
+          @change="changeDescription"
+          v-model="evtdescription">
+          </v-text-field>
+        </v-card-text>
+      </v-card>
+    </v-flex>
+    <!-- </v-flex> -->
+  </v-layout>
 
-    <v-divider />
+  <v-divider />
 
-    <v-layout row wrap>
-      <v-flex d-flex>
-          <v-layout column>
-              <v-container>
-                <v-layout row wrap>
+  <v-layout row wrap>
+    <v-flex d-flex>
+      <v-layout column>
+        <v-container>
+          <v-layout row wrap>
 
-                  <v-text-field
-                    v-model="start_datime"
-                    @blur="changeStartime"
-                    label="Start"
-                    :prepend-icon-cb="openStartDialog"
-                    prepend-icon="event"
-                    :rules="[datimerule]"
-                  />
-                  <!-- <v-text-field
-                    v-model="start_time"
-                    @blur="changeName"
-                    :prepend-icon-cb="openStartDialog"
-                    prepend-icon="schedule"
-                    :rules="[timerule]"
-                  /> -->
+            <v-text-field
+            v-model="start_datime"
+            @blur="changeStartime"
+            label="Start"
+            :prepend-icon-cb="openStartDialog"
+            prepend-icon="event"
+            :rules="[datimerule]"
+            />
+            <!-- <v-text-field
+            v-model="start_time"
+            @blur="changeName"
+            :prepend-icon-cb="openStartDialog"
+            prepend-icon="schedule"
+            :rules="[timerule]"
+            /> -->
 
-                  <v-dialog v-model="showStartPicker" max-width='350px'>
-                    <date-time-picker :date="psdate" :time="pstime" v-on:datime="startDateEvent"/>
-                  </v-dialog>
+            <v-dialog v-model="showStartPicker" max-width='350px'>
+              <date-time-picker :date="psdate" :time="pstime" v-on:datime="startDateEvent"/>
+            </v-dialog>
 
-                </v-layout>
-            </v-container>
-        </v-layout>
+          </v-layout>
+        </v-container>
+      </v-layout>
     </v-flex>
 
-      <v-flex d-flex>
-          <v-layout column>
-              <v-container>
-                <v-layout row wrap>
+    <v-flex d-flex>
+      <v-layout column>
+        <v-container>
+          <v-layout row wrap>
 
-                  <v-text-field
-                    v-model="end_datime"
-                    @blur="changeEndtime"
-                    label="End"
-                    :prepend-icon-cb="openEndDialog"
-                    prepend-icon="event"
-                    :rules="[datimerule]"
-                  />
-                    <!-- <v-text-field
-                      v-model="end_time"
-                      :prepend-icon-cb="openEndDialog"
-                      prepend-icon="schedule"
-                      :rules="[timerule]"
-                    /> -->
+            <v-text-field
+            v-model="end_datime"
+            @blur="changeEndtime"
+            label="End"
+            :prepend-icon-cb="openEndDialog"
+            prepend-icon="event"
+            :rules="[datimerule]"
+            />
+            <!-- <v-text-field
+            v-model="end_time"
+            :prepend-icon-cb="openEndDialog"
+            prepend-icon="schedule"
+            :rules="[timerule]"
+            /> -->
 
-                    <v-dialog v-model="showEndPicker" max-width='800px'>
-                      <date-time-picker :date="pedate" :time="petime" v-on:datime="endDateEvent"/>
-                    </v-dialog>
+            <v-dialog v-model="showEndPicker" max-width='800px'>
+              <date-time-picker :date="pedate" :time="petime" v-on:datime="endDateEvent"/>
+            </v-dialog>
 
-              </v-layout>
-            </v-container>
           </v-layout>
-      </v-flex>
+        </v-container>
+      </v-layout>
+    </v-flex>
 
-      <v-flex xs12 sm6>
-          <v-select
-            label="Involved"
-            multiple
-            :items="parties"
-            v-model="involved"
-            @input="changeInvolved"
-          ></v-select>
-        </v-flex>
+    <v-flex xs12 sm6>
+      <v-select
+      label="Involved"
+      multiple
+      :items="parties"
+      v-model="involved"
+      @input="changeInvolved"
+      ></v-select>
+    </v-flex>
 
-    </v-layout>
-  </div>
+  </v-layout>
+</div>
 </template>
 
 <script>
@@ -173,11 +213,13 @@
         petime: '01:30',
         name: '',
         selectedType: '',
+        level: 'medium',
         selectedLocId: 0,
         selectedLocId2: 0,
         involved: [],
         involved1: ['a', 'b'],
-        location: {}
+        location: {},
+        evtdescription: ''
       }
     },
     computed: {
@@ -193,6 +235,8 @@
 
     methods: {
       changeType: function (newval) { this.eventinfo.type = newval },
+      changeLevel: function (newval) { this.eventinfo.level = newval },
+      changeDescription: function (newval) { this.eventinfo.evtdescription = newval },
       changeLocation: function (newval) { this.eventinfo.location = newval },
       changeInvolved: function (newval) { this.eventinfo.involved = newval },
       changeStartime: function (newval) {
@@ -227,6 +271,8 @@
         // this.selectedLoc = this.eventinfo ? this.eventinfo.location : this.selectedLoc
         this.selectedType = this.eventinfo ? this.eventinfo.type : this.selectedType
         this.name = this.eventinfo ? this.eventinfo.name : this.name
+        this.evtdescription = this.eventinfo ? this.eventinfo.evtdescription : this.evtdescription
+        this.level = this.eventinfo ? this.eventinfo.level : this.level
         this.start_datime = this.eventinfo ? this.eventinfo.starts : this.start_datime
         this.end_datime = this.eventinfo ? this.eventinfo.ends : this.end_datime
         this.start_datime = this.start_datime.replace('T', ' ')
