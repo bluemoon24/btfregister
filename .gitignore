@@ -12,3 +12,10 @@ dist
 
 # service
 service/vendor
+
+#data
+*.numbers
+*.csv
+
+#backup
+bkp
