@@ -2,7 +2,7 @@ function clone (object, data = null, fields = []) {
   for (var f = 0; f < fields.length; f++) {
     let k = fields[f]
     if (data && data.hasOwnProperty(k)) {
-      console.log('cloning', k, data[k])
+      // console.log('cloning', k, data[k])
       object[k] = data[k]
       if (Array.isArray(data[k])) object[k] = Array.from(data[k])
     } else {
@@ -20,17 +20,19 @@ function clone (object, data = null, fields = []) {
 
 export class Person {
   constructor (data = null) {
-    console.log('new Person', data)
-    clone(this, data, ['id', 'name', 'mobile', 'instrument', 'allergies', 'managerof', 'memberof'])
+    this.fields = ['id', 'name', 'mobile', 'instrument', 'allergies', 'managerof', 'memberof']
+    // console.log('new Person', data)
+    clone(this, data, this.fields)
     if (!Array.isArray(this.memberof)) this.memberof = []
     if (!Array.isArray(this.managerof)) this.managerof = []
     return this
   }
-  toNeoProps (pvar) {
+  toNeoProps (pvar = 'p') {
     let list = []
     for (let k in this) {
       if (!this.hasOwnProperty(k) || Array.isArray(this[k])) continue
-      console.log('Person', k, this[k])
+      // console.log('Person', k, this[k])
+      if (this.fields.indexOf(k) < 0) continue
       let str = typeof this[k] === 'string' ? this[k].replace("'", "\\'") : this[k]
       list.push(pvar + '.' + k + " = '" + str + "'")
     }
@@ -42,8 +44,8 @@ export class Group {
   constructor (data = null) {
     // const fields = ['name', 'email', 'mobile', 'role', 'url',
     //   'postaladdress', 'members', 'socials', 'publicity', 'travel', 'eventinfo']
-    clone(this, data, ['id', 'name', 'email', 'mobile', 'role', 'url',
-      'postaladdress', 'comments'])
+    clone(this, data, ['id', 'name', 'email', 'mobile', 'role', 'url', 'postaladdress', 'comments'])
+    this.name = 'New'
     //   } else if (k === 'socials') {
     //   } else if (k === 'publicity') {
     //   } else if (k === 'travel') {
@@ -56,11 +58,11 @@ export class Group {
     // }
     return this
   }
-  toNeoProps (gvar) {
+  toNeoProps (gvar = 'g') {
     let list = []
     for (let k in this) {
       if (!this.hasOwnProperty(k)) continue
-      let str = this[k].replace("'", "\\'")
+      let str = typeof this[k] === 'string' ? this[k].replace("'", "\\'") : this[k]
       list.push(gvar + '.' + k + " = '" + str + "'")
     }
     return list.join()
@@ -83,8 +85,18 @@ export class DbError {
 
 export class Travel {
   constructor (data = null) {
-    clone(this, data, ['arrival', 'departure', 'flightid', 'arrivalat', 'traveltype', 'transport'])
+    clone(this, data, ['arrival', 'departure', 'flightid', 'arrivalat', 'goesby', 'staysat'])
     return this
+  }
+  toNeoProps (pvar = 't') {
+    let list = []
+    for (let k in this) {
+      if (!this.hasOwnProperty(k) || Array.isArray(this[k])) continue
+      // console.log('Person', k, this[k])
+      let str = typeof this[k] === 'string' ? this[k].replace("'", "\\'") : this[k]
+      list.push(pvar + '.' + k + " = '" + str + "'")
+    }
+    return list.join()
   }
 }
 
@@ -122,9 +134,31 @@ export class Eventinfo {
         involved: []
       }
     }
-    clone(this, data, ['id', 'name', 'type', 'starts', 'ends', 'location', 'involved'])
+    clone(this, data, ['id', 'name', 'type', 'starts', 'ends', 'location', 'involved', 'key'])
     console.log('Eventinfo constructor cloned', this)
     return this
+  }
+  toNeoProps (lvar = 'e') {
+    let list = []
+    for (let k in this) {
+      if (!this.hasOwnProperty(k)) continue
+      let str = typeof this[k] === 'string' ? this[k].replace("'", "\\'") : this[k]
+      list.push(lvar + '.' + k + " = '" + str + "'")
+    }
+    return list.join()
+  }
+  toSearch () {
+    let inv = ''
+    if (Array.isArray(this.involved)) inv = this.involved.map(e => e.name).join('')
+    let str = inv + this.name + this.key + this.type + (this.location ? this.location.name : '')
+    // console.log('toSearch', str)
+    return str.toLowerCase()
+  }
+  involvedUids () {
+    let list = []
+    if (Array.isArray(this.involved)) list = this.involved.map(e => e.id)
+    // console.log('involvedUids', list)
+    return list
   }
 }
 
@@ -132,6 +166,15 @@ export class Location {
   constructor (data = null) {
     clone(this, data, ['id', 'name', 'address', 'placeid', 'phone'])
     return this
+  }
+  toNeoProps (lvar = 'l') {
+    let list = []
+    for (let k in this) {
+      if (!this.hasOwnProperty(k)) continue
+      let str = this[k].replace("'", "\\'")
+      list.push(lvar + '.' + k + " = '" + str + "'")
+    }
+    return list.join()
   }
 }
 

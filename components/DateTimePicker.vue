@@ -66,7 +66,7 @@
         return h + ':' + m
       },
       update: function () {
-        console.log('DateTimePicker update', this.date, this.time)
+        // console.log('DateTimePicker update', this.date, this.time)
         this.selectedDate = this.date
         this.selectedTime = this.roundTime(this.time)
         // this.submit()

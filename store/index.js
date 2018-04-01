@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import axios from 'axios'
-import { Group, Person, DbError, Util } from '~/components/Classes.js'
+import { Eventinfo, Group, DbError, Util } from '~/components/Classes.js'
 import Auth from '../mixins/Auth'
 
 Vue.mixin(Auth)
@@ -19,25 +19,11 @@ export const HTTP = {
   },
   post: function () {}
 }
-// export const HTTP = axios.create({
-//   // baseURL: `http://vip-registration.tangofestival-bonn.de/service/`,
-//   baseURL: `http://services.tangofestival-bonn.de`,
-//   headers: {
-//   // Authorization: 'Bearer {token}'
-//     'Content-Type': 'application/json; charset=utf-8',
-//     'Accept': 'application/json'
-//   }
-// })
-
-// var neo4j = new Neo4j()
-// neo4j.addQuery('return "Hello"').then(function (result) {})
-// console.log(neo4j.queryQueue.default[0])
-// neo4j.commit(); // Can't commit without neo4j database connection
 
 export const NEO = axios.create({
   // baseURL: `http://vip-registration.tangofestival-bonn.de/service/`,
-  // baseURL: `http://82.165.102.48:7474/db/data/transaction/commit/`, // prod
-  baseURL: `http://localhost:7474/db/data/transaction/commit/`, // dev
+  baseURL: `http://82.165.102.48:7474/db/data/transaction/commit/`, // prod
+  // baseURL: `http://localhost:7474/db/data/transaction/commit/`, // dev
   headers: {
   // Authorization: 'Bearer {token}'
     'Content-Type': 'application/json; charset=utf-8',
@@ -158,8 +144,9 @@ export const mutations = {
     state.loaded = true
   },
   setRealUser (state, id) {
-    console.log('setRealUser', id)
     state.realUid = id
+    state.privileged = state.uids.find(e => (e.id === id)).privileged
+    console.log('setRealUser', id, state.privileged)
   }
 }
 
@@ -191,37 +178,39 @@ export const actions = {
     commit('setUids', result)
   },
 
-  async getNeo ({state}, name) {
-    let statements = {
-      statements: [
-        { statement: 'MATCH (p:Person)-[:MEMBEROF]->(g:Group {name: $name}) RETURN DISTINCT p',
-          parameters: { name: name }
-        }
-      ]
-    }
-    // let json = statements.replace(/"([^,]+?)":/g, '$1:')
-    console.log('get groups statements', statements)
-    const { data } = await NEO.post('', statements)
-    console.log('data.results', data.results[0].data)
-  },
+  // async getNeo ({state}, name) {
+  //   let statements = {
+  //     statements: [
+  //       { statement: 'MATCH (p:Person)-[:MEMBEROF]->(g:Group {name: $name}) RETURN DISTINCT p',
+  //         parameters: { name: name }
+  //       }
+  //     ]
+  //   }
+  //   // let json = statements.replace(/"([^,]+?)":/g, '$1:')
+  //   console.log('get groups statements', statements)
+  //   const { data } = await NEO.post('', statements)
+  //   console.log('data.results', data.results[0].data)
+  // },
 
-  async storeGroup ({ commit, state }, obj) {
-    let statements = {
-      statements: [ {
-        statement: 'CREATE (g:Group ' + JSON.stringify(obj).replace(/"([^,]+?)":/g, '$1:') + ' ) RETURN g '
-      } ]
-    }
-    // let json = statements.replace(/"([^,]+?)":/g, '$1:')
-    console.log('statements', statements)
-    const { data } = await NEO.post('', statements)
-    console.log(data)
-  },
+  // async storeGroup ({ commit, state }, obj) {
+  //   let statements = {
+  //     statements: [ {
+  //       statement: 'CREATE (g:Group ' + JSON.stringify(obj).replace(/"([^,]+?)":/g, '$1:') + ' ) RETURN g '
+  //     } ]
+  //   }
+  //   // let json = statements.replace(/"([^,]+?)":/g, '$1:')
+  //   console.log('statements', statements)
+  //   const { data } = await NEO.post('', statements)
+  //   console.log(data)
+  // },
 
   async setEventInvolved ({ commit, state }, obj) {
+    let [evid, ...gid] = obj
+    console.log('setEventInvolved', gid)
     let statements = {
       statements: [
-        { statement: 'MATCH (e:Eventinfo {id: "' + obj[0] + '"}), (g:Group {id: "' + obj[1] + '"}) MERGE (e)-[r:INVOLVES]->(g) RETURN e,g' },
-        { statement: 'MATCH (e:Eventinfo {id: "' + obj[0] + '"}), (g:Group {id: "' + obj[1] + '"}) MERGE (g)-[r:INVOLVEDIN]->(e) RETURN e,g ' }
+        { statement: 'MATCH (e:Eventinfo {id: "' + evid + '"}), (g:Group) WHERE g.id IN [' + gid + '] MERGE (e)-[r:INVOLVES]->(g) RETURN e,g' },
+        { statement: 'MATCH (e:Eventinfo {id: "' + evid + '"}), (g:Group) WHERE g.id IN [' + gid + '] MERGE (g)-[r:INVOLVEDIN]->(e) RETURN e,g ' }
       ]
     }
     // let json = statements.replace(/"([^,]+?)":/g, '$1:')
@@ -230,37 +219,42 @@ export const actions = {
     console.log(data)
   },
 
-  async setEventLcoation ({ commit, state }, obj) {
+  async setEventLocation ({ commit, state }, obj) {
+    let [evid, locid] = obj
+    console.log('setEventLocation', evid, locid)
     let statements = {
       statements: [
-        { statement: 'MATCH (e:Eventinfo {id: "' + obj[0] + '"}), (l:Location {id: "' + obj[1] + '"}) MERGE (e)-[r:AT]->(l) RETURN e,l' },
-        { statement: 'MATCH (e:Eventinfo {id: "' + obj[0] + '"}), (l:Location {id: "' + obj[1] + '"}) MERGE (l)-[r:HASEVENT]->(e) RETURN e,l ' }
+        { statement: 'MATCH (e:Eventinfo {id: "' + evid + '"}), (l:Location {id: "' + locid + '"}) MERGE (e)-[r:AT]->(l) RETURN e,l' },
+        { statement: 'MATCH (e:Eventinfo {id: "' + evid + '"}), (l:Location {id: "' + locid + '"}) MERGE (l)-[r:HASEVENT]->(e) RETURN e,l ' }
       ]
     }
     // let json = statements.replace(/"([^,]+?)":/g, '$1:')
     console.log('statements', statements)
     const { data } = await NEO.post('', statements)
-    console.log(data)
+    console.log(data.errors)
+  },
+
+  async getId (obj, type) {
+    let statements = {
+      statements: [ {
+        statement: 'MATCH (n:' + type + ') return max(toInteger(n.id)) as max'
+      } ]
+    }
+    const { data } = await NEO.post('', statements)
+    if (data.errors.length !== 0) {
+      console.log('Error in getId for node type' + type, data.errors)
+      return null
+    }
+    return '' + (Util.parseResult(data.results)[0][0].max + 1)
   },
 
   async updatePerson ({ commit, state }, obj) {
     let [person, gid] = obj
     console.log('updatePerson 1', person, gid)
-    if (!person.id || person.id === '') {
-      let statements = {
-        statements: [ {
-          statement: 'MATCH (n:Person) return max(toInteger(n.id)) as max'
-        } ]
-      }
-      // MATCH (n { name: 'Andres' }) SET n.position = 'Developer', n.surname = 'Taylor'
-      console.log('updatePerson statements (1)', statements)
-      const { data } = await NEO.post('', statements)
-      if (data.errors.length !== 0) {
-        console.log('Error in updatePerson (1)', data.errors)
-        return
-      }
-      person.id = '' + (Util.parseResult(data.results)[0][0].max + 1)
-      console.log('updatePerson parseResult', person.id)
+    if (!person.id || person.id === '') person.id = await this.dispatch('getId', 'Person')
+    if (!person.id) {
+      console.log('Could not get ID for Person', person)
+      return
     }
 
     console.log('updatePerson', person, gid)
@@ -312,19 +306,6 @@ export const actions = {
     console.log(data)
   },
 
-  async storePerson ({ commit, state }, obj) {
-    let statements = {
-      statements: [ {
-        statement: 'CREATE (p:Person ' + JSON.stringify(obj).replace(/"([^,]+?)":/g, '$1:') + ' ) RETURN p '
-      } ]
-    }
-
-    // let json = statements.replace(/"([^,]+?)":/g, '$1:')
-    console.log('storePerson statements', statements)
-    const { data } = await NEO.post('', statements)
-    console.log(data)
-  },
-
   async storeEventinfo ({ commit, state }, obj) {
     let statements = {
       statements: [ {
@@ -348,11 +329,59 @@ export const actions = {
     console.log(data)
   },
 
+  async updateEventinfoData ({ commit, state }, obj) {
+    if (!obj.id || obj.id === '') obj.id = await this.dispatch('getId', 'Eventinfo')
+    if (!obj.id) {
+      console.log('Could not get ID for Eventinfo', obj)
+      return
+    }
+
+    console.log('**** updateEventinfoData', obj)
+    let ev = new Eventinfo(obj)
+    delete ev.involved
+    delete ev.location
+    console.log('**** updateEventinfoData (2)', obj)
+    let set = ev.toNeoProps('e')
+    let statements = {
+      statements: [ {
+        statement: 'MERGE (e:Eventinfo {id: "' + ev.id + '"}) SET ' + set
+      } ]
+    }
+    // MATCH (n { name: 'Andres' }) SET n.position = 'Developer', n.surname = 'Taylor'
+    console.log('updateEventinfoData:statements', statements)
+    const { data } = await NEO.post('', statements)
+    if (data.errors.length !== 0) {
+      console.log('Error in updateGroup', data.errors)
+      return
+    }
+    if (obj.location !== '') await this.dispatch('setEventLocation', [ev.id, obj.location])
+    if (obj.involved !== '') await this.dispatch('setEventInvolved', [ev.id, obj.involved.map(e => ('"' + e + '"'))])
+    //   commit('setUserData', obj)
+    //   this.dispatch('getUids')
+    // }
+  },
+
+  async deleteEventinfoData ({ commit, state }, evid) {
+    let statements = {
+      statements: [
+        { statement: 'MATCH (e:Eventinfo {id: $evid}) DETACH DELETE e',
+          parameters: { evid: evid }
+        }
+      ]
+    }
+    console.log('deleteEventinfoData statements', statements)
+    const { data } = await NEO.post('', statements)
+    if (data.errors.length !== 0) console.log('Error in deleteEventinfoData', data.errors)
+    let results = Util.parseResult(data.results)
+    console.log('deleteEventinfoData results', results)
+    await this.dispatch('getEventinfoData')
+  },
+
   async getEventinfoData ({ commit, state }) {
     console.log('getEventinfoData (from NEO)')
     let statements = {
       statements: [
-        { statement: 'MATCH (e:Eventinfo) RETURN  e' },
+        { statement: 'MATCH (e:Eventinfo) WITH e ORDER BY e.starts RETURN  e' },
         { statement: 'MATCH (el:Eventinfo)-[:AT]->(l:Location) RETURN  el,l' },
         { statement: 'MATCH (eg:Eventinfo)-[:INVOLVES]->(g:Group) RETURN  eg,g' }
       ]
@@ -382,19 +411,11 @@ export const actions = {
     commit('setEventinfoData', evts)
   },
 
-  async uploadEventinfoData ({ commit, state }, obj) {
-    var updurl = '/eventinfo/update'
-    const { data } = await HTTP.post(updurl, {body: obj})
-    if (!data) return null
-    commit('setEventinfoData', obj)
-    // console.log('response after update', data)
-  },
-
   async getLocationData ({ commit, state }) {
     console.log('getLocationData (from NEO)')
     let statements = {
       statements: [
-        { statement: 'MATCH (l:Location) RETURN  l' }
+        { statement: 'MATCH (l:Location) WITH l ORDER BY l.name RETURN l' }
       ]
     }
     console.log('getLocationData statements', statements)
@@ -402,24 +423,96 @@ export const actions = {
     commit('setLocationData', data.results[0].data.map(d => (d.row[0])))
   },
 
-  async uploadLocationData ({ commit, state }, obj) {
-    var updurl = '/location/update'
-    const { data } = await HTTP.post(updurl, {body: obj})
-    if (!data) return null
-    commit('setLocationData', obj)
-    // console.log('response after update', data)
+  async updateLocationData ({ commit, state }, loc) {
+    if (!loc.id || loc.id === '') loc.id = await this.dispatch('getId', 'Location')
+    if (!loc.id) {
+      console.log('Could not get ID for Location', loc)
+      return
+    }
+    let set = loc.toNeoProps('l')
+    let statements = {
+      statements: [ {
+        statement: 'MERGE (l:Location {id: "' + loc.id + '"}) SET ' + set
+      } ]
+    }
+    // MATCH (n { name: 'Andres' }) SET n.position = 'Developer', n.surname = 'Taylor'
+    console.log('updateLocationData:statements', statements)
+    const { data } = await NEO.post('', statements)
+    if (data.errors.length !== 0) console.log('Error in updateLocationData', data.errors)
+    else {
+      await this.dispatch('getLocationData')
+    }
   },
 
-  async uploadPersonData ({ commit, state }, obj) {
-    var updurl = '/person/update'
-    let person = new Person(obj)
-    person.memberof = JSON.stringify(obj.memberof)
-    person.managerof = JSON.stringify(obj.managerof)
-    const { data } = await HTTP.post(updurl, {body: person})
-    if (!data) return null
-    console.log('from uploadPersonData')
-    commit('setPersonData', obj)
-    // console.log('response after update', data)
+  async deleteLocationData ({ commit, state }, locid) {
+    let statements = {
+      statements: [
+        { statement: 'MATCH (l:Location {id: $locid}) DETACH DELETE l',
+          parameters: { locid: locid }
+        }
+      ]
+    }
+    console.log('deleteLocation statements', statements)
+    const { data } = await NEO.post('', statements)
+    if (data.errors.length !== 0) console.log('Error in deleteLocationData', data.errors)
+    let results = Util.parseResult(data.results)
+    console.log('deleteLocation results', results)
+    await this.dispatch('getLocationData')
+  },
+
+  // async uploadLocationData ({ commit, state }, obj) {
+  //   var updurl = '/location/update'
+  //   const { data } = await HTTP.post(updurl, {body: obj})
+  //   if (!data) return null
+  //   commit('setLocationData', obj)
+  //   // console.log('response after update', data)
+  // },
+
+  // async uploadPersonData ({ commit, state }, obj) {
+  //   var updurl = '/person/update'
+  //   let person = new Person(obj)
+  //   person.memberof = JSON.stringify(obj.memberof)
+  //   person.managerof = JSON.stringify(obj.managerof)
+  //   const { data } = await HTTP.post(updurl, {body: person})
+  //   if (!data) return null
+  //   console.log('from uploadPersonData')
+  //   commit('setPersonData', obj)
+  //   // console.log('response after update', data)
+  // },
+  //
+  async deletePerson ({ commit, state }, pid) {
+    let statements = {
+      statements: [
+        { statement: 'MATCH (p:Person {id: $pid}) DETACH DELETE p',
+          parameters: { pid: pid }
+        }
+      ]
+    }
+    console.log('deletePerson statements', statements)
+    const { data } = await NEO.post('', statements)
+    let results = Util.parseResult(data.results)
+    console.log('deletePerson results', results)
+  },
+
+  async deleteMember ({ commit, state }, obj) {
+    let [pid, gid] = obj
+    console.log('deleteMember (from NEO)', pid, gid)
+    let statements = {
+      statements: [
+        { statement: 'MATCH (p:Person {id: $pid})<-[r:HASMEMBER|MEMBEROF]->(g:Group {id: $gid}) DELETE r',
+          parameters: { pid: pid, gid: gid }
+        },
+        { statement: 'MATCH (p:Person {id: $pid})<-[r]->() RETURN count(*) as count',
+          parameters: { pid: pid }
+        }
+      ]
+    }
+    console.log('deleteMember statements', statements)
+    const { data } = await NEO.post('', statements)
+    console.log('data.results', data.results)
+    let results = Util.parseResult(data.results)
+    console.log('deleteMember results', results, results[1][0].count)
+    if (results[1][0].count === 0) this.dispatch('deletePerson', pid)
   },
 
   async getMembers ({ commit, state }, uid) {
@@ -466,16 +559,16 @@ export const actions = {
       }
       const { data } = await NEO.post('', statements)
 
-      console.log('index:getUserData data.results', JSON.stringify(data.results))
+      // console.log('index:getUserData data.results', JSON.stringify(data.results))
 
       let results = Util.parseResult(data.results)
       let members = results[1] ? results[1].map((m) => (m.p)) : []
       let manager = results[2].length > 0 ? results[2][0].p : {}
 
-      console.log('parsedResult', JSON.stringify(results))
-      console.log('****groups', results[0][0].g)
-      console.log('****members', members)
-      console.log('****managers', manager)
+      // console.log('parsedResult', JSON.stringify(results))
+      // console.log('****groups', results[0][0].g)
+      // console.log('****members', members)
+      // console.log('****managers', manager)
 
       commit('setUserData', results[0][0].g)
       commit('setMembers', [uid, members])
@@ -517,49 +610,12 @@ export const actions = {
     }
   },
 
-  // async uploadUserData ({ commit, state }, obj) {
-  //   // obsolete
-  //   var body = null
-  //   // if (Array.isArray(obj.memberof)) obj.memberof = JSON.stringify(obj.memberof)
-  //   // else obj.memberof = '[]'
-  //   for (var k in obj) {
-  //     console.log('uploadUserData', k, obj[k], state.udata[k])
-  //     if (body === null) body = {}
-  //     body[k] = obj[k]
-  //   }
-  //   state.saved = false
-  //   console.log('body for update', body)
-  //   // var body = obj.obj
-  //   var updurl = '/update' + (state.uid !== '' ? '/' : '') + state.uid
-  //   const { data } = await HTTP.post(updurl, {body: body})
-  //   if (!data) return null
-  //   obj['uid'] = data
-  //   commit('setUserData', obj)
-  //   // console.log('response after update', data)
-  // },
-  //
   async resendLink ({ commit }, obj) {
     console.log('try to find', obj)
   },
 
   setRealUser ({ commit }, id) {
     commit('setRealUser', id)
-  },
-
-  updateMember (context, obj) {
-    console.log('updateMemeber', obj)
-    var idx = obj.index
-    if (obj.person !== null) {
-      context.state.udata.members.tdata[idx] = obj.person
-    } else {
-      context.state.udata.members.tdata.splice(1, idx)
-    }
-    console.log('updateMember 2', context.state.udata.members.tdata)
-    // context.commit('uploadUserData')
-    // console.log('uid in main', state.uid) // , this.$route.params.id)
-  },
-  addMember (context, obj) {
-    context.state.udata.members.tdata.push(obj)
-    // context.commit('uploadUserData')
+    this.dispatch('getUserData', id)
   }
 }

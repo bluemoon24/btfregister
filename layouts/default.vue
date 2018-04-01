@@ -7,10 +7,10 @@
       fixed
       app
     >
-    Uid {{ $store.state.uid }}, realUid {{ $store.state.realUid }}
+    Uid {{ $store.state.uid }}, realUid {{ $store.state.realUid }}, privileged {{ $privileged }}
     <v-toolbar>
       <v-toolbar-title>{{ $store.state.udata.name
-        + ($store.state.privileged ? ' (admin)' : '')}}</v-toolbar-title>
+        + ($privileged ? ' (admin)' : '')}}</v-toolbar-title>
       <v-spacer></v-spacer>
 
     <v-btn
@@ -61,7 +61,7 @@
       </v-btn> -->
       <v-toolbar-title v-text="title"></v-toolbar-title>
       <v-spacer></v-spacer>
-      <div v-if="$store.state.privileged">
+      <div v-if="$privileged">
       <span>{{ $store.state.udata.name }}</span>
       <v-menu :nudge-width="300">
           <v-toolbar-side-icon slot="activator">
@@ -69,7 +69,8 @@
         </v-toolbar-side-icon>
 
         <v-list>
-          <template v-for="item in [{id: '0', name: '<create new>'}, {id: '-1', name: '<delete current>'}].concat($store.state.uids)" >
+          <!-- <template v-for="item in [{id: '0', name: '<create new>'}, {id: '-1', name: '<delete current>'}].concat($store.state.uids)" > -->
+          <template v-for="item in $store.state.uids" >
           <v-list-tile @click="switchToUid(item.id)" :key="item.id">
             <v-list-tile-title v-text="item.name" ></v-list-tile-title>
           </v-list-tile>
@@ -133,21 +134,23 @@
         if (uid < 0) {
           console.log('delete current account', this.$store.state.uid)
           this.$store.dispatch('deleteGroup', this.$store.state.uid)
-        } else if (uid === '0') {
-          console.log('/' + this.$route.params.id + '/account')
+        } else if (uid === '0' || !uid) {
+          console.log('switch to, uid is 0, route:/' + this.$route.params.id + '/account')
           this.$router.push({path: '/' + this.$route.params.id + '/account'})
+          this.$store.dispatch('getUserData', 0)
         } else {
           this.$store.dispatch('getUserData', uid)
         }
       },
       update: function () {
-        console.log('mixin', this.$privileged, this.$route.params.id)
-        console.log('default:update', this.$store.state.uid, ':', this.$route.params.id)
-        let uid = this.$store.state.uid !== '' ? this.$store.state.uid : this.$route.params.id
+        console.log('mixins', this.$privileged, this.$canedit, this.$validuser, this.$route.params.id)
+        console.log('default:update', this.$store.state.uid ? 'uid true' : 'uid false', ':', this.$route.params.id)
+        // let uid = this.$store.state.uid || this.$route.params.id
+        // if (this.$route.params.id) this.$router.push({path: '/'})
         // console.log('***update ', uid, this.$store.state.uids.find((e) => (e.id === uid)))
         // this.user = this.$store.state.uids.find((e) => (e.id === uid))
         this.items = [ { icon: 'apps', title: 'Welcome', to: '/' + this.$route.params.id } ]
-        this.name = (this.$store.state.uid !== '0' ? this.$store.state.udata.name : 'New')
+        this.name = (this.$store.state.uid ? this.$store.state.udata.name : 'New')
         if (this.$store.state.uid || this.$privileged) {
           this.items.push({ icon: 'account_circle', title: 'Account', to: '/' + this.$route.params.id + '/account' })
           this.items.push({ icon: 'details', title: 'Details', to: '/' + this.$route.params.id + '/details' })
@@ -156,7 +159,7 @@
         }
         if (this.$privileged) {
           this.items.push({ icon: 'location_searching', title: 'Edit Locations', to: '/' + this.$route.params.id + '/locations' })
-          this.items.push({ icon: 'account_box', title: 'Admin', to: '/' + uid + '/admin' })
+          this.items.push({ icon: 'account_box', title: 'Admin', to: '/' + this.$route.params.id + '/admin' })
         }
         // console.log('layout updated', this.$store.state.uids, this.$store.state.privileged)
       }

@@ -69,6 +69,7 @@
       }
     },
     computed: {
+      hasaddress: function () { return this.location.address.length > 1 },
       showtheMap: {
         get: () => (this.showMap),
         set: (value) => (this.mapShown = value)
@@ -95,6 +96,7 @@
         })
       },
       getMaploc: function () {
+        if (!this.hasaddress) return
         this.showProgress = true
         console.log('address lookup', this.location.address)
         const baseURL = 'https://maps.googleapis.com/maps/api/geocode/json?address=<address>&key=AIzaSyC5koryrIZY83R6fJ9CKMVSiB1QGa-kjFg'

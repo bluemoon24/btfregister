@@ -100,8 +100,9 @@ export default {
     }
   },
   async fetch ({ store, params, redirect }) {
-    if ((store.state.uid === '0' || !store.state.uid) && !store.state.privileged) return redirect('/')
-    await store.dispatch('getUserData', store.state.uid || params.id)
+    // note: mixins not yet available
+    if (!store.state.uids.some(e => e.id === params.id)) return redirect('/')
+    await store.dispatch('getUserData', store.state.uid)
   },
   watch: {
     '$store.state.uid': 'update'
@@ -112,7 +113,7 @@ export default {
   methods: {
     update: function () {
       console.log('account:update', this.$store.state.uid, this.$route.params)
-      let group = this.$store.state.uid !== '0' ? this.$store.state.udata : new Group()
+      let group = this.$store.state.uid ? this.$store.state.udata : new Group()
       for (var k in group) {
         if (!this.group[k]) continue
         this.group[k].text = group[k]

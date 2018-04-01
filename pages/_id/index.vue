@@ -11,7 +11,7 @@ import { mapState } from 'vuex'
 export default {
   async fetch ({ store, params, redirect }) {
     store.dispatch('setRealUser', params.id)
-    console.log('index:fetch', store.state.privileged, store.state.uids, params.id)
+    // console.log('index:fetch', store.state.privileged, store.state.uids, params.id)
     if (!store.state.uids.some((uids) => uids.id === params.id)) {
       return redirect('/')
     } else {

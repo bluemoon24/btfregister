@@ -40,15 +40,25 @@
 
     computed: {
       list: function () {
+        console.log('computing new list')
         return this.locations.map((loc) => ({ item: loc, header: loc.name }))
       }
     },
 
+    watch: {
+      '$store.state.locationData': 'update'
+    },
+
     created: function () {
-      this.locations = Array.from(this.$store.state.locationData, (loc) => (new Location(loc)))
+      this.update()
     },
 
     methods: {
+      update: function () {
+        console.log('location:update')
+        this.locations = Array.from(this.$store.state.locationData, (loc) => (new Location(loc)))
+        this.selectedIndex = -1
+      },
       handleListEvents: function (e) {
         console.log('listevent', e)
         switch (e.type) {
@@ -60,13 +70,19 @@
             this.locations = this.locations || []
             this.locations.push(new Location())
             break
+          case 'delete':
+            console.log('location:delete', this.selected.id, typeof this.selected.id)
+            this.$store.dispatch('deleteLocationData', this.selected.id)
+            break
           case 'action':
             if (e.payload.action === 'submit') {
               let loc = new Location(e.payload.item)
-              this.$store.dispatch('uploadLocationData', loc)
+              this.$store.dispatch('updateLocationData', loc)
             } else if (e.payload.action === 'show') {
-              this.showMap = true
+              console.log('try to sho map', e.payload.item.address.length > 10 || e.payload.item.placeid.length > 0)
+              this.showMap = e.payload.item.address.length > 10 || e.payload.item.placeid.length > 0
             }
+            break
         }
       }
     },

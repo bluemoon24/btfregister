@@ -1,0 +1,19 @@
+{
+  "logger": {
+    "title": "Remote Sync"
+  },
+  "uploadOnSave": true,
+  "useAtomicWrites": false,
+  "deleteLocal": false,
+  "hostname": "82.165.102.48",
+  "port": "22",
+  "target": "/root/htdocs/btfregister",
+  "ignore": [
+    ".remote-sync.json",
+    ".git/**"
+  ],
+  "username": "root",
+  "password": "Tj0UIG8e9M",
+  "watch": [],
+  "transport": "scp"
+}

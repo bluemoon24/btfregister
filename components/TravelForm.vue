@@ -88,15 +88,26 @@
 
       <v-divider />
 
-      <v-expansion-panel >
+      <v-flex xs12 md6>
+      <v-select
+         :items="$store.state.locationData"
+         v-model="selected"
+         item-text="name"
+         item-value="id"
+         label="Select location"
+         single-line
+         bottom
+       ></v-select>
+     </v-flex>
+
+      <!-- <v-expansion-panel >
         <v-expansion-panel-content v-model="expandLocation">
             <div slot="header">{{ selectedLoc.name }}
-            </div>
-      <v-flex xs12 md6>
-        <v-card>
+            </div> -->
+        <!-- <v-card>
           <v-card-title>Accomodation location</v-card-title>
-          <v-card-text>
-            <v-select
+          <v-card-text> -->
+            <!-- <v-select
                :items="$store.state.locationData"
                v-model="selected"
                item-text="name"
@@ -104,8 +115,8 @@
                label="Select location"
                single-line
                bottom
-             ></v-select>
-        <v-text-field
+             ></v-select> -->
+        <!-- <v-text-field
           label="address"
           multi-line
           v-model="selectedAddress"
@@ -113,15 +124,15 @@
         <v-text-field
           label="phone"
           v-model="selectedLoc.phone"
-        />
-      </v-card-text>
+        /> -->
+      <!-- </v-card-text>
       <v-card-actions>
         <v-btn color="primary" flat @click.stop="showMap=true">Show on map</v-btn>
       </v-card-actions>
-    </v-card>
-    </v-flex>
+    </v-card> -->
+    <!-- </v-flex>
   </v-expansion-panel-content>
-</v-expansion-panel >
+</v-expansion-panel > -->
 
       <v-dialog v-model="showMap">
         <map-dialog :location="selectedLoc" :show="showMap" v-on:mapclosed="showMap=false"/>

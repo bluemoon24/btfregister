@@ -10,6 +10,7 @@
   <v-divider/>
 
   <travel-form v-if="travelset === 'group'"></travel-form>
+
   <tb-list v-else
     title='Travel information (individually)'
     add_icon='playlist_add'
@@ -49,6 +50,7 @@
       if (store.state.uid === '0' && !store.state.privileged) return redirect('/')
       await store.dispatch('getUserData', store.state.uid || params.id)
       await store.dispatch('getLocationData')
+      await store.dispatch('getTravelData')
     },
     mounted: function () {
       this.members = this.$store.state.udata.members

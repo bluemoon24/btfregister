@@ -14,6 +14,14 @@
           v-on:managerChanged="managerChanged"
           />
        </tb-list>
+       <v-snackbar
+        color="red"
+        :timeout="0"
+        v-model="showNoManager"
+        >
+        Cannot delete manager.<br>Choose another member as manager and try again.
+        <v-btn dark flat @click.native="showNoManager = false">Ok</v-btn>
+      </v-snackbar>
   </div>
 </template>
 
@@ -27,6 +35,7 @@
     },
     data: () => {
       return {
+        showNoManager: false,
         selectedIndex: -1,
         valid: false,
         managerSelected: '',
@@ -44,7 +53,7 @@
       }
     },
     async fetch ({ store, params, redirect }) {
-      // if (store.state.uid === '0') return redirect('/')
+      if (store.state.uid === '0') redirect('/' + params.id)
       await store.dispatch('getUserData', store.state.uid || params.id)
       // await store.dispatch('getMembers', store.state.uid)
     },
@@ -61,7 +70,8 @@
     },
     methods: {
       update: function () {
-        if (this.$store.uid === '0') return this.$route.push('/')
+        console.log('details.update: uid', this.$store.state.uid ? 'is true' : 'is false')
+        if (!this.$store.state.uid) return this.$router.push('/' + this.$route.params.id)
         this.members = Array.from(this.$store.state.udata.members, (m) => {
           let thisperson = new Person(m)
           thisperson.isManager = thisperson.isManager || this.$store.state.udata.managedby.id === thisperson.id
@@ -112,7 +122,13 @@
       //   this.selectedIndex = this.members.findIndex((e) => (e.selected))
       // },
       deleteMember: function () {
-        this.members.splice(this.selectedIndex, 1)
+        console.log('deleteMember', this.members[this.selectedIndex])
+        if (this.members[this.selectedIndex].person.isManager) {
+          this.showNoManager = true
+          return
+        }
+        // this.members.splice(this.selectedIndex, 1)
+        this.$store.dispatch('deleteMember', [this.members[this.selectedIndex].person.id, this.$store.state.uid])
         console.log('selectedIndex', this.selectedIndex)
       },
       addMember: function () {

@@ -1,0 +1,24 @@
+stop and remove neo4j image
+run container interactively
+Mac:
+docker run \
+--publish=7474:7474 \
+--publish=7473:7473 \
+--publish=7687:7687 \
+--volume=/srv/neo4j/btf:/data \
+--name=neo4j \
+-it \
+neo4j \
+-c /bin/bash
+Cloud:
+docker run \
+--publish=7474:7474 \
+--publish=7473:7473 \
+--publish=7687:7687 \
+--volume=/srv/neo4j/data:/data \
+--name=neo4j \
+-it \
+neo4j \
+-c /bin/bash
+bin/neo4j-admin dump --database=graph.db --to=data/<file>.dump
+bin/neo4j-admin load --from=data/<file>.dump --database=graph.db --force

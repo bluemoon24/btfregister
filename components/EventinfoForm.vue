@@ -3,7 +3,7 @@
     <v-flex xs6>
     <v-text-field
       v-model="name"
-      @blur="changeEvent"
+      @input="changeName"
       label="Name"
     />
   </v-flex>
@@ -14,8 +14,8 @@
           {text: 'Milonga', value: 'milonga'},
           {text: 'Workshop', value: 'workshop'},
           {text: 'Performance (Show, Concert)', value: 'performance'},
-          {text: 'Pickup', value: 'pickup'}]"
-          @input="changeEvent"
+          {text: 'Travel and Transport', value: 'tnt'}]"
+          @input="changeType"
         v-model="selectedType"
         label="Event type"
       ></v-select>
@@ -25,13 +25,21 @@
     <v-select
        ref="loc"
        :items="locations"
-       @input="changeEvent"
+       @input="changeLocation"
        v-model="selectedLocId"
        item-text="name"
        item-value="id"
-       label="Select location"
+       :label="selectedType === 'tnt' ? 'Select pickup location' : 'Select target location'"
      ></v-select>
-     <v-btn flat small color="primary" >New</v-btn>
+     <v-select v-if="selectedType === 'tnt'"
+        ref="loc"
+        :items="locations"
+        v-model="selectedLocId2"
+        item-text="name"
+        item-value="id"
+        label="Select target location"
+      ></v-select>
+     <!-- <v-btn flat small color="primary" >New</v-btn> -->
    </v-flex>
 
     <v-divider />
@@ -44,7 +52,7 @@
 
                   <v-text-field
                     v-model="start_datime"
-                    @blur="changeEvent"
+                    @blur="changeStartime"
                     label="Start"
                     :prepend-icon-cb="openStartDialog"
                     prepend-icon="event"
@@ -52,7 +60,7 @@
                   />
                   <!-- <v-text-field
                     v-model="start_time"
-                    @blur="changeEvent"
+                    @blur="changeName"
                     :prepend-icon-cb="openStartDialog"
                     prepend-icon="schedule"
                     :rules="[timerule]"
@@ -74,7 +82,7 @@
 
                   <v-text-field
                     v-model="end_datime"
-                    @blur="changeEvent"
+                    @blur="changeEndtime"
                     label="End"
                     :prepend-icon-cb="openEndDialog"
                     prepend-icon="event"
@@ -102,7 +110,7 @@
             multiple
             :items="parties"
             v-model="involved"
-            @input="changeEvent"
+            @input="changeInvolved"
           ></v-select>
         </v-flex>
 
@@ -113,7 +121,7 @@
 <script>
   import MapDialog from '~/components/MapDialog.vue'
   import DateTimePicker from '~/components/DateTimePicker.vue'
-  import { Eventinfo, Util } from '~/components/Classes.js'
+  import { Util } from '~/components/Classes.js'
 
   export default {
     name: 'eventinfo-form',
@@ -130,12 +138,12 @@
     },
     watch: {
       'eventinfo': {
-        handler: 'update',
-        deep: true
-      },
-      'eventinfo.location': {
-        handler: 'update',
-        deep: true
+        handler: 'update'
+        // deep: true
+      // },
+      // 'eventinfo.location': {
+      //   handler: 'update',
+      //   deep: true
       }
     },
 
@@ -166,6 +174,7 @@
         name: '',
         selectedType: '',
         selectedLocId: 0,
+        selectedLocId2: 0,
         involved: [],
         involved1: ['a', 'b'],
         location: {}
@@ -183,17 +192,18 @@
     },
 
     methods: {
-      changeEvent: function (newval) {
-        let ev = new Eventinfo(this.eventinfo)
-        ev.type = this.selectedType
-        // ev.location = this.selectedLoc
-        ev.starts = this.start_datime.replace(/\s/, 'T')
-        ev.ends = this.end_datime.replace(/\s/, 'T')
-        ev.name = this.name
-        ev.involved = this.$store.state.uids.filter((e) => (this.involved.includes(e.id)))
-        console.log('submit ev', ev)
-        this.$emit('update:eventinfo', ev)
-        // this.$emit('update:type', tnew)
+      changeType: function (newval) { this.eventinfo.type = newval },
+      changeLocation: function (newval) { this.eventinfo.location = newval },
+      changeInvolved: function (newval) { this.eventinfo.involved = newval },
+      changeStartime: function (newval) {
+        console.log('changeStartime', newval)
+        this.eventinfo.starts = newval
+      },
+      changeEndtime: function (newval) { this.eventinfo.ends = newval },
+      changeName: function (newval) {
+        // ev.starts = this.start_datime.replace(/\s/, 'T')
+        // ev.ends = this.end_datime.replace(/\s/, 'T')
+        this.eventinfo.name = newval
       },
       formatDateTime: function (date) {
         let [y, m, d, h, min] = [date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes()]
@@ -223,9 +233,9 @@
         this.end_datime = this.end_datime.replace('T', ' ')
         let involved = this.eventinfo && Array.isArray(this.eventinfo.involved) ? this.eventinfo.involved : this.involved
         this.involved = involved.map((e) => (e.id || ''))
-        console.log('****  involved', involved)
-        console.log('****  involved 2', this.involved)
-        console.log('****  involved 3', this.eventinfo.involved)
+        // console.log('****  involved', involved)
+        // console.log('****  involved 2', this.involved)
+        // console.log('****  involved 3', this.eventinfo.involved)
         let ds = new Date(this.eventinfo ? this.eventinfo.starts : this.start_date)
         // console.log('ds is ', ds, this.eventinfo.starts)
         // let [d, m, y] = ds.toLocaleDateString().split('.')
@@ -262,7 +272,7 @@
           this.start_date = e.payload.date
           this.start_time = e.payload.time
           this.start_datime = e.payload.datime
-          this.changeEvent()
+          this.changeStartime(this.start_datime.replace(/\s/, 'T'))
         }
         this.showStartPicker = false
       },
@@ -270,8 +280,9 @@
         console.log('endDateEvent', e)
         if (e.type === 'save') {
           this.end_date = e.payload.date
-          // this.end_time = e.payload.time
-          this.changeEvent()
+          this.end_time = e.payload.time
+          this.end_datime = e.payload.datime
+          this.changeEndtime(this.end_datime.replace(/\s/, 'T'))
         }
         this.showEndPicker = false
       },
