@@ -22,8 +22,8 @@ export const HTTP = {
 
 export const NEO = axios.create({
   // baseURL: `http://vip-registration.tangofestival-bonn.de/service/`,
-  // baseURL: `http://82.165.102.48:7474/db/data/transaction/commit/`, // prod
-  baseURL: `http://localhost:7474/db/data/transaction/commit/`, // dev
+  baseURL: `http://82.165.102.48:7474/db/data/transaction/commit/`, // prod
+  // baseURL: `http://0.0.0.0:7474/db/data/transaction/commit/`, // dev
   headers: {
   // Authorization: 'Bearer {token}'
     'Content-Type': 'application/json; charset=utf-8',
