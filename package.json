@@ -1,6 +1,6 @@
 {
   "name": "vuetifynuxt",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Nuxt.js + Vuetify.js project",
   "author": "Lothar Burow <lothar@b-welcome.de>",
   "private": true,
