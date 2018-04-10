@@ -2,7 +2,7 @@
   <div>
     <v-layout row wrap>
       <v-flex xs12 md12>
-        <!-- <v-toolbar dark dense flat v-for="item in $store.state.uids" :key="item.id">
+        <!-- <v-toolbar dense flat v-for="item in $store.state.uids" :key="item.id">
           <v-toolbar-side-icon></v-toolbar-side-icon>
           <v-toolbar-title>{{ item.name }} </v-toolbar-title>
           <v-spacer></v-spacer>
@@ -16,22 +16,16 @@
         {{ action.label }}
         </v-btn> -->
 
-        <v-list dark flat>
+        <v-list flat>
           <v-list-tile v-for="item in $store.state.uids" :key="item.id">
-            <v-list-tile-title>{{ item.name }}</v-list-tile-title>
-            <v-spacer />
-            <v-btn v-for="action in actions" :key="action.id" class="ml-1 mt-4" flat icon small dense nuxt @click="selectAction(item.id, action.id)">
+            <v-list-tile-title v-html="item.name"></v-list-tile-title>
+            <v-list-tile-action v-for="action in actions" :key="action.id" nuxt @click="selectAction(item.id, action.id)">
+            <v-icon >{{ action.icon }}</v-icon>
+          </v-list-tile-action>
+            <!-- <v-btn v-for="action in actions" :key="action.id" class="ml-1 mt-4" flat icon small dense nuxt @click="selectAction(item.id, action.id)">
               <v-icon >{{ action.icon }}</v-icon>
             </v-btn>
-
-            <!-- <v-menu open-on-hover top offset-y>
-               <v-btn dark slot="activator">Action</v-btn>
-               <v-list>
-                 <v-list-tile v-for="item in options" :key="item" @click="">
-                   <v-list-tile-title>{{ item }}</v-list-tile-title>
-                 </v-list-tile>
-               </v-list>
-             </v-menu> -->
+          -->
            </v-list-tile>
         </v-list>
 
@@ -55,7 +49,7 @@
           { label: 'Mail to..', id: 'mail', icon: 'mail' },
           { label: 'News for', id: 'news', icon: 'message' },
           { label: 'Delete', id: 'delete', icon: 'delete' },
-          { label: 'Work as..', id: 'switch', icon: 'remove_re_eye' }
+          { label: 'Work as..', id: 'switch', icon: 'remove_red_eye' }
         ]
       }
     },
@@ -80,8 +74,8 @@
     //   this.vipList.push({id: '', name: 'New ...'})
     },
     methods: {
-      selectAction: function (action) {
-        console.log('Admin:selectedAction', action)
+      selectAction: function (item, action) {
+        console.log('Admin:selectedAction', item, action)
         // this.$store.dispatch('getUserData', this.selectedAction)
         // this.$store.dispatch('setRealUser', this.selectedAction)
       }

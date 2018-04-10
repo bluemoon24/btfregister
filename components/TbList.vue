@@ -6,7 +6,7 @@
       <v-text-field v-if="showfilter"
         prepend-icon="filter_list"
         label="Filter"
-        solo dark
+        solo
         flat clearable lazy
         @input="$emit('update:filter', myfilter)"
         v-model="myfilter"
@@ -18,7 +18,7 @@
       </v-toolbar-side-icon>
 
       <v-dialog v-model="dialog" persistent max-width="290">
-        <v-toolbar-side-icon dark slot="activator" :disabled="selectedIndex < 0">
+        <v-toolbar-side-icon  slot="activator" :disabled="selectedIndex < 0">
           <v-icon>delete</v-icon>
         </v-toolbar-side-icon>
          <v-card>
@@ -41,7 +41,7 @@
             <slot :index="i"></slot>
           </v-card-text>
         </v-card>
-        <v-toolbar color='grey darken-3'>
+        <v-toolbar >
           <v-card-actions v-for="a in actions" :key="a.id">
             <v-btn color="primary" flat nuxt @click="handleAction(l, a)">{{ a.label }}</v-btn>
           </v-card-actions>

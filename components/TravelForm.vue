@@ -35,26 +35,44 @@
       <v-flex d-flex>
         <v-container>
           <v-layout column>
-            <v-text-field @click="departurePicker=false; arrivalPicker=!arrivalPicker"
-              slot="activator"
+            <v-dialog
+                 ref="dialog"
+                 persistent
+                 v-model="arrivalPicker"
+                 lazy
+                 full-width
+                 width="290px"
+                 :return-value.sync="arrival"
+               >
+            <v-text-field
               label="Arrival date"
               v-model="arrival"
               prepend-icon="event"
-              readonly>
+              :prepend-icon-cb="() => {departurePicker=false; arrivalPicker=!arrivalPicker}"
+              :rules="[datimerule]"
+              >
             </v-text-field>
+              <v-date-picker v-model="arrival" scrollable>
+              <v-spacer></v-spacer>
+              <v-btn flat color="primary" @click="arrivalPicker = false">Cancel</v-btn>
+              <v-btn flat color="primary" @click="$refs.dialog.save(arrival)">OK</v-btn>
+            </v-date-picker>
+          </v-dialog>
+<!--
             <v-date-picker v-if="arrivalPicker"
               v-model="arrival"
-              :allowed-dates="allowedDates"
               no-title
+              :allowedDates="allowedDates"
+
               actions>
               <template slot-scope="{ save, cancel }">
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn flat color="primary" @click="cancel">Reset</v-btn>
-                  <v-btn flat color="primary" @click="arrivalPicker=false">Close</v-btn>
+                  <v-btn flat color="primary" @click="arrivalPicker=false">Submit</v-btn>
                 </v-card-actions>
               </template>
-            </v-date-picker>
+            </v-date-picker> -->
           </v-layout>
         </v-container>
       </v-flex>
@@ -62,22 +80,24 @@
       <v-flex d-flex>
         <v-container>
           <v-layout column>
-            <v-text-field @click="departurePicker=!departurePicker; arrivalPicker=false"
+            <v-text-field
               slot="activator"
               label="Departure date"
               v-model="departure"
               prepend-icon="event"
-              readonly>
+              :prepend-icon-cb="() => {arrivalPicker=false; departurePicker=!departurePicker}"
+              :rules="[datimerule]"
+                >
             </v-text-field>
             <v-date-picker v-if="departurePicker"
               v-model="departure"
-              :allowed-dates="allowedDates"
               no-title
+              :allowedDates="allowedDates"
               actions>
               <template slot-scope="{ save, cancel }">
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn flat color="primary" @click="cancel">Reset</v-btn>
+                  <v-btn flat color="primary" @click="departurePicker=false">Reset</v-btn>
                   <v-btn flat color="primary" @click="departurePicker=false">Close</v-btn>
                 </v-card-actions>
               </template>
@@ -100,40 +120,6 @@
        ></v-select>
      </v-flex>
 
-      <!-- <v-expansion-panel >
-        <v-expansion-panel-content v-model="expandLocation">
-            <div slot="header">{{ selectedLoc.name }}
-            </div> -->
-        <!-- <v-card>
-          <v-card-title>Accomodation location</v-card-title>
-          <v-card-text> -->
-            <!-- <v-select
-               :items="$store.state.locationData"
-               v-model="selected"
-               item-text="name"
-               item-value="id"
-               label="Select location"
-               single-line
-               bottom
-             ></v-select> -->
-        <!-- <v-text-field
-          label="address"
-          multi-line
-          v-model="selectedAddress"
-        />
-        <v-text-field
-          label="phone"
-          v-model="selectedLoc.phone"
-        /> -->
-      <!-- </v-card-text>
-      <v-card-actions>
-        <v-btn color="primary" flat @click.stop="showMap=true">Show on map</v-btn>
-      </v-card-actions>
-    </v-card> -->
-    <!-- </v-flex>
-  </v-expansion-panel-content>
-</v-expansion-panel > -->
-
       <v-dialog v-model="showMap">
         <map-dialog :location="selectedLoc" :show="showMap" v-on:mapclosed="showMap=false"/>
       </v-dialog>
@@ -143,6 +129,7 @@
 
 <script>
   import MapDialog from '~/components/MapDialog.vue'
+  import { Util } from '~/components/Classes.js'
 
   export default {
     name: 'travel-form',
@@ -190,7 +177,7 @@
         departure: null,
         arrivalat: null,
         departureat: '',
-        allowedDates: [
+        allowedDts: [
           new Date('2018-04-26').toISOString().substr(0, 10),
           new Date('2018-04-27').toISOString().substr(0, 10),
           new Date('2018-04-28').toISOString().substr(0, 10),
@@ -204,6 +191,7 @@
       locations: function () {
         return this.$store.state.locationData.map((loc) => ({ text: loc.name, value: loc.id }))
       },
+      allowedDates: val => (val) => (val >= new Date('2018-04-26').toISOString().substr(0, 10) || val <= new Date('2018-05-01').toISOString().substr(0, 10)),
       selectedAddress: function () {
         const mapbaseURL = 'https://www.google.com/maps/embed/v1/place?key=AIzaSyDvzFijrwdV5DqXYAp1mspYWjN4vK5Z4AI&q='
         if (!this.selected) return ''
@@ -246,6 +234,16 @@
         var d = new Date(this.arrival)
         d.setDate(d.getDate() + 1)
         return d.toISOString().substr(0, 10)
+      },
+      timerule: (value) => (/^$|^([01]?[0-9]|2[0-3]):(00|15|30|45)$/.test(value) || 'Invalid time format (hh:00, hh:15, ...)'),
+      daterule: (value) => {
+        return Util.isValidDate(value) || 'Invalid date'
+      },
+      datimerule: (value) => {
+        const pat = /^$|^([01]?[0-9]|2[0-3]):([0-5][0-9])$/
+        let [d, t] = value.split(/\s/)
+        if (!t) t = ''
+        return (Util.isValidDate(d) && pat.test(t)) || 'Invalid date or time'
       }
     }
   }

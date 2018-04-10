@@ -2,7 +2,7 @@
   <div>
     <v-layout>
       <v-form v-model="valid">
-        {{ person }}
+        <!-- {{ person }} -->
         <div v-for="(f, k) in person" :key="k">
           <v-text-field v-if="!!controls[k] && controls[k].type === 'text' && (k !== 'instrument' || role === 'musician')"
             :placeholder="controls[k].placeholder"
@@ -12,14 +12,14 @@
             :rules="validationRule(k)"
             :multi-line="controls[k].type === 'textarea'"
             v-model="person[k]"
-            editable dark
+            editable
           />
           <v-checkbox v-if="!!controls[k] && controls[k].type === 'checkbox'"
             :label="controls[k].label"
             :type="controls[k].type"
             v-model="person[k]"
             @change="changeEvent"
-            dark
+            
           />
         </div>
       </v-form>
@@ -82,7 +82,7 @@
         rules: {
           required: (value) => !!value || 'Required.',
           phone: (value) => {
-            return /^\d?(\d+\s?)*$/.test(value) || 'Invalid number'
+            return /(\d+\s?)*$/.test(value) || 'Invalid number'
           }
         }
       }

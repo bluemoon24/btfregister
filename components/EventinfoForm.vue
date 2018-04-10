@@ -14,11 +14,12 @@
         <!-- <v-container fluid> -->
         <v-flex >
           <v-select
-          ref="type"
           :items="[
           {text: 'Milonga', value: 'milonga'},
           {text: 'Workshop', value: 'workshop'},
           {text: 'Performance (Show, Concert)', value: 'performance'},
+          {text: 'Soundcheck', value: 'soundcheck'},
+          {text: 'Construction', value: 'constraction'},
           {text: 'Travel and Transport', value: 'tnt'}]"
           @input="changeType"
           v-model="selectedType"
@@ -28,7 +29,6 @@
 
         <v-flex>
           <v-select v-if="selectedType === 'workshop'"
-          ref="type"
           :items="[
           {text: 'Beginner', value: 'beginner'},
           {text: 'Medium', value: 'medium'},
@@ -42,7 +42,6 @@
 
       <v-flex >
         <v-select
-        ref="loc"
         :items="locations"
         @input="changeLocation"
         v-model="selectedLocId"
@@ -51,8 +50,8 @@
         :label="selectedType === 'tnt' ? 'Pickup location' : 'Target location'"
         ></v-select>
         <v-select v-if="selectedType === 'tnt'"
-        ref="loc"
         :items="locations"
+        @input="changeTargetLoc"
         v-model="selectedLocId2"
         item-text="name"
         item-value="id"
@@ -62,11 +61,11 @@
       </v-flex>
     </v-flex>
     <!-- </v-container> -->
-    <v-flex xs6 class="mt-0">
+    <v-flex xs12 sm6 class="mt-0">
       <v-card height="100%">
         <!-- <v-card-title><h2></h2></v-card-title> -->
         <v-card-text >
-          Event evtdescription
+          Event description
           <v-text-field
           height="100%"
           class="mt-0"
@@ -85,14 +84,14 @@
   <v-divider />
 
   <v-layout row wrap>
-    <v-flex d-flex>
+    <v-flex d-flex  xs12 sm6>
       <v-layout column>
         <v-container>
           <v-layout row wrap>
 
             <v-text-field
             v-model="start_datime"
-            @blur="changeStartime"
+            @change="changeStartime"
             label="Start"
             :prepend-icon-cb="openStartDialog"
             prepend-icon="event"
@@ -115,14 +114,14 @@
       </v-layout>
     </v-flex>
 
-    <v-flex d-flex>
+    <v-flex d-flex xs12 sm6>
       <v-layout column>
         <v-container>
           <v-layout row wrap>
 
             <v-text-field
             v-model="end_datime"
-            @blur="changeEndtime"
+            @change="changeEndtime"
             label="End"
             :prepend-icon-cb="openEndDialog"
             prepend-icon="event"
@@ -135,7 +134,7 @@
             :rules="[timerule]"
             /> -->
 
-            <v-dialog v-model="showEndPicker" max-width='800px'>
+            <v-dialog v-model="showEndPicker" max-width='350px'>
               <date-time-picker :date="pedate" :time="petime" v-on:datime="endDateEvent"/>
             </v-dialog>
 
@@ -238,6 +237,7 @@
       changeLevel: function (newval) { this.eventinfo.level = newval },
       changeDescription: function (newval) { this.eventinfo.evtdescription = newval },
       changeLocation: function (newval) { this.eventinfo.location = newval },
+      changeTargetLoc: function (newval) { this.eventinfo.targetloc = newval },
       changeInvolved: function (newval) { this.eventinfo.involved = newval },
       changeStartime: function (newval) {
         console.log('changeStartime', newval)
@@ -267,6 +267,7 @@
         // console.log('json of array', this.eventinfo.involved)
         // console.log('involved', this.eventinfo.involved, Array.isArray(this.eventinfo.involved), typeof this.eventinfo.involved)
         this.selectedLocId = this.eventinfo && this.eventinfo.location ? this.eventinfo.location.id : -1
+        this.selectedLocId2 = this.eventinfo && this.eventinfo.targetloc ? this.eventinfo.targetloc.id : -1
         // console.log('locs', this.locs, '>', this.eventinfo.location, '>', this.selectedLocId)
         // this.selectedLoc = this.eventinfo ? this.eventinfo.location : this.selectedLoc
         this.selectedType = this.eventinfo ? this.eventinfo.type : this.selectedType
@@ -334,11 +335,13 @@
       },
       openStartDialog: function () {
         [this.psdate, this.pstime] = this.start_datime.split(/\s/)
+        // console.log('openStartDialog', this.psdate, this.pstime)
         // this.pstime = this.start_time
         this.showStartPicker = true
       },
       openEndDialog: function () {
         [this.pedate, this.petime] = this.end_datime.split(/\s/)
+        console.log('openEndDialog', this.pedate, this.petime)
         // this.petime = this.end_time
         this.showEndPicker = true
       }

@@ -4,7 +4,7 @@
       <v-flex xs6 class="pr-3">
       <v-text-field
         label="Filter"
-        solo dark
+        solo
         flat lazy
         v-model="filter"
         >
@@ -50,6 +50,13 @@
       :actions="$privileged ? [{ id: 'submit', label: 'submit', close: true }, { id: 'cancel', label: 'cancel', close: true }] : ''"
       v-on:tblistevent="handleListEvents"
       >
+      <!-- <travel-form
+        :eventinfo.sync="selected"
+        :type.sync="type"
+        :locations="$store.state.locationData"
+        slot-scope='props'
+      /> -->
+
       <eventinfo-form
         :eventinfo.sync="selected"
         :type.sync="type"
@@ -88,11 +95,10 @@
       list: function () {
         console.log('compute list from', this.eventinfoList)
         console.log('filteredDays', this.filteredDays.join(), '|', this.filteredDays.length, '|', this.$store.state.realUid)
-
         return this.eventinfoList.filter((e) => (
           e.toSearch().search(this.filter.toLowerCase()) >= 0 &&
           (this.alluids || e.involvedUids().indexOf(this.$store.state.uid) >= 0) &&
-          (this.filteredDays.join().search(e.starts.split('T')[0]) >= 0 || this.filteredDays.length <= 0)
+          (this.filteredDays.join().search(e.starts.split(' ')[0]) >= 0 || this.filteredDays.length <= 0)
         )
         ).map((evt) => ({
           item: evt,

@@ -9,11 +9,13 @@
         </v-card-title>
         <v-card-text>
           <v-date-picker
-            :allowed-dates="allowedDates || null"
+            :allowedDates="allowedDates || null"
             v-model="selectedDate"
             no-title
+            reactive
             actions>
           </v-date-picker>
+
         </v-card-text>
       <!-- </v-card> -->
     <!-- </v-flex> -->

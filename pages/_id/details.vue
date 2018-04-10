@@ -20,7 +20,7 @@
         v-model="showNoManager"
         >
         Cannot delete manager.<br>Choose another member as manager and try again.
-        <v-btn dark flat @click.native="showNoManager = false">Ok</v-btn>
+        <v-btn  flat @click.native="showNoManager = false">Ok</v-btn>
       </v-snackbar>
   </div>
 </template>

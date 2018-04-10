@@ -5,19 +5,30 @@
     :list="list"
     add_icon='person_add'
     :actions="[{ id: 'submit', label: 'submit', close: true }, { id: 'cancel', label: 'cancel', close: true }]"
-    v-on:tblistevent="selectAction"
-      ></tb-list>
+    v-on:tblistevent="handleListEvents"
+      >
+      <account-form
+        :vip.sync="selected"
+        slot-scope='props'
+      />
+
+    </tb-list>
   </div>
 </template>
 
 <script>
   import TbList from '~/components/TbList.vue'
+  import AccountForm from '~/components/AccountForm.vue'
+  import { Group, Util } from '~/components/Classes.js'
+
   export default {
     components: {
-      TbList
+      TbList, AccountForm
     },
     data: () => {
       return {
+        selected: '',
+        newgroup: null,
         selectedAction: '',
         actions: [
           { label: 'Mail to..', id: 'mail', icon: 'mail' },
@@ -37,7 +48,9 @@
     },
     computed: {
       list: function () {
-        return this.$store.state.uids.map((m) => ({ item: m, header: m.name, icon: null }))
+        let st = this.$store.state.uids
+        if (this.newgroup) st = st.concat([this.newgroup])
+        return st.map((m) => ({ item: m, header: m.name, icon: null }))
       }
     },
     mounted: function () {
@@ -48,11 +61,55 @@
     //   this.vipList.push({id: '', name: 'New ...'})
     },
     methods: {
-      selectAction: function (action) {
-        console.log('Admin:selectedAction', action)
-        // this.$store.dispatch('getUserData', this.selectedAction)
-        // this.$store.dispatch('setRealUser', this.selectedAction)
+      handleListEvents: function (e) {
+        console.log('listevent', e)
+        switch (e.type) {
+          case 'selected':
+            this.selectedIndex = e.payload
+            if (this.selectedIndex >= 0) {
+              this.selected = this.list[e.payload].item
+              console.log('handleListevent adminnew', this.selected)
+            }
+            break
+          case 'add':
+            this.newgroup = new Group()
+            // this.eventinfoList = this.eventinfoList || []
+            // this.eventinfoList.push(new Eventinfo())
+            break
+          case 'delete':
+            // this.$store.dispatch('deleteEventinfoData', this.selected.id)
+            break
+          case 'action':
+            if (e.payload.action === 'submit') {
+              console.log('submit payload', e.payload)
+              this.submit(e.payload.item)
+              this.newgroup = null
+              // let ev = new Eventinfo(this.selected)
+              // ev.involved = JSON.stringify(e.payload.item.involved)
+              // console.log('updateEventinfoData:submit', this.selected)
+              // this.$store.dispatch('updateEventinfoData', this.selected)
+            // console.log('submitevent', this.selected)
+            }
+            break
+        }
+      },
+      submit: function (item) {
+        console.log('submit form', item)
+        // let data = {}
+        // for (let k in this.group) {
+        //   data[k] = this.group[k].text
+        // }
+        let group = new Group(item)
+        // for (var k in this.group) {
+        //   obj[k] = this.group[k].text
+        // }
+        // group['role'] = this.role.text
+        group['id'] = item.uid !== '0' ? item.uid : Util.createUid(this.$store.state.uids)
+        // if (!group.members) group.members = '[]'
+        console.log('submit form (2)', group)
+        // this.$store.dispatch('updateGroup', group)
       }
+
     }
   }
 </script>

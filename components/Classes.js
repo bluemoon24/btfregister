@@ -127,6 +127,7 @@ export class Eventinfo {
     if (!data) {
       data = {
         location: {},
+        targetloc: {},
         name: 'New Event',
         type: '',
         starts: '2018-04-27T15:00',
@@ -136,7 +137,7 @@ export class Eventinfo {
         level: 'medium'
       }
     }
-    clone(this, data, ['id', 'name', 'type', 'level', 'starts', 'ends', 'location', 'involved', 'key', 'evtdescription'])
+    clone(this, data, ['id', 'name', 'type', 'level', 'starts', 'ends', 'location', 'targetloc', 'involved', 'key', 'evtdescription'])
     console.log('Eventinfo constructor cloned', this)
     return this
   }

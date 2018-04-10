@@ -18,17 +18,19 @@
         :textarea="f.type === 'textarea'"
         :rules="validationRule(k)"
         v-model="f.text"
-        editable 
+        editable
       />
     </v-form>
-    <v-btn :disabled="!valid" color="primary" @click="submit" flat nuxt >submit</v-btn>
+    <!-- <v-btn :disabled="!valid" color="primary" @click="submit" flat nuxt >submit</v-btn> -->
     <!-- <v-btn color="primary" to="eventinfo" flat nuxt >Event</v-btn> -->
   </div>
 </template>
 
 <script>
-import { Group, Util } from '~/components/Classes.js'
+import { Group } from '~/components/Classes.js'
 export default {
+  name: 'account-form',
+  props: ['vip'],
   data () {
     return {
       valid: false,
@@ -101,19 +103,27 @@ export default {
   },
   async fetch ({ store, params, redirect }) {
     // note: mixins not yet available
+    console.log('UID', this.vip.id)
     if (!store.state.uids.some(e => e.id === params.id)) return redirect('/')
-    await store.dispatch('getUserData', store.state.uid)
+    await store.dispatch('getUserData', this.vip.id)
   },
   watch: {
-    '$store.state.uid': 'update'
+    'vip': 'getUserData'
   },
   mounted: function () {
+    if (!this.vip) return
     this.update()
   },
   methods: {
+    getUserData: async function () {
+      if (!this.vip) return
+      await this.$store.dispatch('getUserData', this.vip.id)
+      this.update()
+    },
     update: function () {
-      console.log('account:update', this.$store.state.uid, this.$route.params)
-      let group = this.$store.state.uid ? this.$store.state.udata : new Group()
+      console.log('account:update', this.vip.id, this.$store.state.udata)
+
+      let group = this.vip.id ? this.$store.state.udata : new Group(this.$store.state.udata)
       for (var k in group) {
         if (!this.group[k]) continue
         this.group[k].text = group[k]
@@ -129,22 +139,22 @@ export default {
       //   case 'url': return [this.rules.url]
       // }
       return []
-    },
-    submit: function () {
-      console.log('submit form')
-      let data = {}
-      for (let k in this.group) {
-        data[k] = this.group[k].text
-      }
-      let group = new Group(data)
-      // for (var k in this.group) {
-      //   obj[k] = this.group[k].text
-      // }
-      group['role'] = this.role.text
-      group['id'] = this.$store.state.uid !== '0' ? this.$store.state.uid : Util.createUid(this.$store.state.uids)
-      // if (!group.members) group.members = '[]'
-      console.log('submit form', group)
-      this.$store.dispatch('updateGroup', group)
+    // },
+    // submit: function () {
+    //   console.log('submit form')
+    //   let data = {}
+    //   for (let k in this.group) {
+    //     data[k] = this.group[k].text
+    //   }
+    //   let group = new Group(data)
+    //   // for (var k in this.group) {
+    //   //   obj[k] = this.group[k].text
+    //   // }
+    //   group['role'] = this.role.text
+    //   group['id'] = this.uid !== '0' ? this.uid : Util.createUid(this.uids)
+    //   // if (!group.members) group.members = '[]'
+    //   console.log('submit form', group)
+    //   this.$store.dispatch('updateGroup', group)
     }
   }
 }

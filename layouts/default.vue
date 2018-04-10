@@ -1,5 +1,5 @@
 <template>
-  <v-app dark>
+  <v-app light>
     <v-navigation-drawer
       :mini-variant.sync="miniVariant"
       :clipped="clipped"
@@ -70,7 +70,7 @@
 
         <v-list>
           <!-- <template v-for="item in [{id: '0', name: '<create new>'}, {id: '-1', name: '<delete current>'}].concat($store.state.uids)" > -->
-          <template v-for="item in $store.state.uids" >
+          <template v-for="item in [{id: '0', name: '<create new>'}, {id: '-1', name: '<delete current>'}].concat($store.state.uids)" >
           <v-list-tile @click="switchToUid(item.id)" :key="item.id">
             <v-list-tile-title v-text="item.name" ></v-list-tile-title>
           </v-list-tile>
@@ -154,8 +154,8 @@
         if (this.$store.state.uid || this.$privileged) {
           this.items.push({ icon: 'account_circle', title: 'Account', to: '/' + this.$route.params.id + '/account' })
           this.items.push({ icon: 'details', title: 'Details', to: '/' + this.$route.params.id + '/details' })
-          this.items.push({ icon: 'card_travel', title: 'Travel', to: '/' + this.$route.params.id + '/travel' })
-          this.items.push({ icon: 'info', title: 'Festival Info', to: '/' + this.$route.params.id + '/eventinfo' })
+          // this.items.push({ icon: 'card_travel', title: 'Travel', to: '/' + this.$route.params.id + '/travel' })
+          this.items.push({ icon: 'info', title: 'Timeline', to: '/' + this.$route.params.id + '/eventinfo' })
         }
         if (this.$privileged) {
           this.items.push({ icon: 'location_searching', title: 'Edit Locations', to: '/' + this.$route.params.id + '/locations' })

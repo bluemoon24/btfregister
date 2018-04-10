@@ -25,7 +25,7 @@ export const NEO = axios.create({
   baseURL: `http://82.165.102.48:7474/db/data/transaction/commit/`, // prod
   // baseURL: `http://0.0.0.0:7474/db/data/transaction/commit/`, // dev
   headers: {
-  // Authorization: 'Bearer {token}'
+    'Authorization': 'Basic bmVvNGo6Mk1hbnlTZWNyZXRz',
     'Content-Type': 'application/json; charset=utf-8',
     'Accept': 'application/json; charset=utf-8'
   }
@@ -64,11 +64,21 @@ export const mutations = {
     state.privileged = priv
     state.uid = ''
   },
+
   setEventinfoData (state, data) {
     state.eventinfoData = data
     // console.log('setEventinfoData', typeof data.involved)
     // state.eventinfoData.involved = JSON.parse(data.involved)
     console.log('***** mutation eventinfo data', data)
+  },
+
+  setTargetLocation (state, el) {
+    let [eid, loc] = el
+    console.log('setTargetLocation', eid, loc)
+    let idx = state.eventinfoData.findIndex((e) => (e.id === eid))
+    if (idx < 0) console.log('***** event not found:', eid, 'in', state.eventinfoData)
+    state.eventinfoData[idx].targetloc = loc
+    console.log('*******>>>>>>', state.eventinfoData)
   },
 
   setEventLocation (state, el) {
@@ -219,6 +229,21 @@ export const actions = {
     console.log(data)
   },
 
+  async setTargetLocation ({ commit, state }, obj) {
+    let [evid, locid] = obj
+    console.log('setTargetLocation', evid, locid)
+    let statements = {
+      statements: [
+        { statement: 'MATCH (e:Eventinfo {id: "' + evid + '"}), (l:Location {id: "' + locid + '"}) MERGE (e)-[r:TO]->(l) RETURN e,l' },
+        { statement: 'MATCH (e:Eventinfo {id: "' + evid + '"}), (l:Location {id: "' + locid + '"}) MERGE (l)-[r:FROM]->(e) RETURN e,l ' }
+      ]
+    }
+    // let json = statements.replace(/"([^,]+?)":/g, '$1:')
+    console.log('statements', statements)
+    const { data } = await NEO.post('', statements)
+    console.log(data.errors)
+  },
+
   async setEventLocation ({ commit, state }, obj) {
     let [evid, locid] = obj
     console.log('setEventLocation', evid, locid)
@@ -355,6 +380,7 @@ export const actions = {
       return
     }
     if (obj.location !== '') await this.dispatch('setEventLocation', [ev.id, obj.location])
+    if (obj.targetloc !== '') await this.dispatch('setTargetLocation', [ev.id, obj.targetloc])
     if (obj.involved !== '') await this.dispatch('setEventInvolved', [ev.id, obj.involved.map(e => ('"' + e + '"'))])
     //   commit('setUserData', obj)
     //   this.dispatch('getUids')
@@ -383,10 +409,11 @@ export const actions = {
       statements: [
         { statement: 'MATCH (e:Eventinfo) WITH e ORDER BY e.starts RETURN  e' },
         { statement: 'MATCH (el:Eventinfo)-[:AT]->(l:Location) RETURN  el,l' },
-        { statement: 'MATCH (eg:Eventinfo)-[:INVOLVES]->(g:Group) RETURN  eg,g' }
+        { statement: 'MATCH (eg:Eventinfo)-[:INVOLVES]->(g:Group) RETURN  eg,g' },
+        { statement: 'MATCH (et:Eventinfo)-[:TO]->(t:Location) RETURN  et,t' }
       ]
     }
-    // console.log('getEventinfoData statements', statements)
+    console.log('getEventinfoData statements', statements)
     const { data } = await NEO.post('', statements)
 
     // console.log('getEventinfoData results', data.results)
@@ -395,11 +422,17 @@ export const actions = {
     let evts = results[0].map(d => (d.e))
     let evlocs = results[1].map(d => ({e: d.el, l: d.l}))
     let evgroup = results[2].map(d => ({e: d.eg, g: d.g}))
+    let evtgts = results[3].map(d => ({e: d.et, t: d.t}))
     // console.log('getEventinfoData:parsed', evts, evlocs, evgroup)
     for (var i = 0; i < evlocs.length; i++) {
       if (!evlocs[i].e) continue
       let evt = evts.find((e) => (e.id === evlocs[i].e.id))
       evt.location = evlocs[i].l
+    }
+    for (i = 0; i < evtgts.length; i++) {
+      if (!evtgts[i].e) continue
+      let evt = evts.find((e) => (e.id === evtgts[i].e.id))
+      evt.targetloc = evtgts[i].t
     }
     for (i = 0; i < evgroup.length; i++) {
       if (!evgroup[i].e) continue
@@ -407,7 +440,7 @@ export const actions = {
       if (!evt.involved || !Array.isArray(evt.involved)) evt.involved = []
       evt.involved.push(evgroup[i].g)
     }
-    console.log('getEventinfoData result', JSON.stringify(evts))
+    console.log('getEventinfoData result', evts)
     commit('setEventinfoData', evts)
   },
 
