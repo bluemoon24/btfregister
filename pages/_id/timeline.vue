@@ -1,66 +1,22 @@
 <template>
   <div>
-    <!-- {{ person }} -->
-    <!-- <location-form :showMap.sync="showMap" :location.sync="location" v-on:mapclosed="showMap = false"/>
-    <v-btn @click="showMap=true">show on map</v-btn> -->
-
-    <!-- <v-btn @click="migrategroups">Migrate Groups</v-btn>
-    <v-btn @click="migratepersons">Migrate Persons</v-btn>
-    <v-btn @click="setManagerRelations">Migrate Manager Relations</v-btn>
-    <v-btn @click="setMemberRelations">Migrate Member Relations</v-btn><br>
-
-    <v-btn @click="migrateLocations">Migrate Locations</v-btn><br>
-
-    <v-btn @click="migrateEventinfo">Migrate Events</v-btn>
-    <v-btn @click="setEventRelations">Migrate Event Relations</v-btn><br> -->
-
-    <v-btn @click="getUids()">Get all uids</v-btn>
-    <v-btn @click="$store.dispatch('getUserData', $store.state.uid)">Get user data {{ $store.state.uid }}</v-btn>
-    <v-btn @click="getUids('Beltango')">Get Beltango</v-btn>
-    <v-btn @click="getUids('Bandonegro')">Get Bandonegro</v-btn>
-    <v-btn @click="getUids('Organizers')">Get Organizers</v-btn>
-
+    {{personData}}
   </div>
 </template>
 
 <script>
-  import LocationForm from '~/components/LocationForm.vue'
-  // import axios from 'axios'
-  import { DerivedClass } from '~/components/Classes.js'
-
   export default {
-
-    // export const state = () => ({
-    //   sidebar: false
-    // })
-    //
-    // export const mutations = {
-    //   toggleSidebar (state) {
-    //     state.sidebar = !state.sidebar
-    //   }
-    // }
-    //
-    // export default {
-    // function toneo(obj) {
-    //   let result = []
-    //   for (let k in obj) {
-    //     result.push('' + k + ':"' + obj[k] + '"')
-    //   }
-    //   return '{' + result.join(',') + '}'
-    // }
-    components: {
-      LocationForm
-    },
     computed: {
-      // personData: function () {
-      //   this.$store.state.personData.map((p) => ({id: p.id, name: p.name, allergies: p.allergies, instrument: p.instrument, mobile: p.mobile}))
-      // }
+      personData: function () {
+        this.$store.state.personData.map((p) => ({id: p.id, name: p.name, allergies: p.allergies, instrument: p.instrument, mobile: p.mobile}))
+      }
     },
 
     async fetch ({ store, params, redirect }) {
       if (params.id === '0' && !store.state.privileged) return redirect('/')
       await store.dispatch('getUserData', params.id)
       await store.dispatch('getEventinfoData')
+      await store.dispatch('getLocationData')
     },
 
     methods: {
@@ -139,25 +95,8 @@
           }
         }
       }
-    },
-
-    data: () => {
-      return {
-        // location: new Location({
-        // }),
-        person: new DerivedClass({
-          id: 'id',
-          name: 'name',
-          mobile: 'mobile',
-          instrument: 'bandoneon',
-          // managerof: ['A', 'B'],
-          // memberof: [ { m1: 'group', m2: 'member2' } ]
-          allergies: 'allergies'
-        }),
-        person_string: '',
-        showMap: false
-      }
     }
+
   }
 </script>
 

@@ -3,6 +3,7 @@
     <v-form v-model="valid">
       <v-radio-group v-model="role.text" :label="role.label" :rules="[rules.required]">
         <v-layout wrap>
+
           <v-flex xs4 md3 v-for="o in role.options">
             <v-radio :label="o.text" :value="o.value" ></v-radio>
           </v-flex>
@@ -17,20 +18,17 @@
         :textarea="f.type === 'textarea'"
         :rules="validationRule(k)"
         v-model="f.text"
-        @change="update"
         editable
       />
     </v-form>
-    <!-- <v-btn :disabled="!valid" color="primary" @click="submit" flat nuxt >submit</v-btn> -->
+    <v-btn :disabled="!valid" color="primary" @click="submit" flat nuxt >submit</v-btn>
     <!-- <v-btn color="primary" to="eventinfo" flat nuxt >Event</v-btn> -->
   </div>
 </template>
 
 <script>
-// import { Group } from '~/components/Classes.js'
+import { Group, Util } from '~/components/Classes.js'
 export default {
-  name: 'account-form',
-  props: ['vip'],
   data () {
     return {
       valid: false,
@@ -103,50 +101,27 @@ export default {
   },
   async fetch ({ store, params, redirect }) {
     // note: mixins not yet available
-    // console.log('account form fetch UID', this.vip.id)
-    // if (!store.state.uids.some(e => e.id === params.id)) return redirect('/')
-    // await store.dispatch('getUserData', this.vip.id)
+    console.log('account.vue', store.state.privileged)
+    if (!store.state.privileged && !store.state.uids.some(e => e.id === params.id)) return redirect('/')
+    await store.dispatch('getUserData', store.state.uid)
   },
   watch: {
-    'vip': function () {
-      console.log('vip watcher', this.vip)
-      this.updateGroup()
-    }
+    '$store.state.uid': 'update'
   },
   mounted: function () {
-    // console.log('mounted', this.vip ? this.vip.id : 'no vip')
-    // if (!this.vip) return
-    this.updateGroup()
+    this.update()
   },
   methods: {
-    getUserData: async function () {
-      if (!this.vip) return
-      await this.$store.dispatch('getUserData', this.vip.id)
-      console.log('getUserData', this.vip.id, this.$store.state.udata)
-      // this.update()
-    },
-    updateGroup: function () {
-      console.log('account:update', this.vip)
-
-      // let group = this.vip.id ? this.$store.state.udata : new Group(this.$store.state.udata)
-      for (var k in this.vip) {
+    update: function () {
+      console.log('account:update', this.$store.state.uid, this.$route.params)
+      let group = this.$store.state.uid ? this.$store.state.udata : new Group()
+      for (var k in group) {
         if (!this.group[k]) continue
-        this.group[k].text = this.vip[k]
+        this.group[k].text = group[k]
       }
       // this.role.text = this.$store.state.udata.role.tdata
-      this.role.text = (this.role.options.some((v) => (v.value === this.vip.role))
-        ? this.vip.role : '')
-    },
-
-    update: function () {
-      // let group = this.vip.id ? this.$store.state.udata : new Group(this.$store.state.udata)
-      for (var k in this.group) {
-        console.log('account:update', k, this.group[k], this.vip.hasOwnProperty(k))
-        if (!this.vip || !this.vip.hasOwnProperty(k)) continue
-        this.vip[k] = this.group[k].text
-      }
-      this.vip.role = this.role.text
-      this.$emit('update:vip', this.vip)
+      this.role.text = (this.role.options.some((v) => (v.value === group.role))
+        ? group.role : '')
     },
     validationRule: function (k) {
       // switch (k) {
@@ -155,22 +130,22 @@ export default {
       //   case 'url': return [this.rules.url]
       // }
       return []
-    // },
-    // submit: function () {
-    //   console.log('submit form')
-    //   let data = {}
-    //   for (let k in this.group) {
-    //     data[k] = this.group[k].text
-    //   }
-    //   let group = new Group(data)
-    //   // for (var k in this.group) {
-    //   //   obj[k] = this.group[k].text
-    //   // }
-    //   group['role'] = this.role.text
-    //   group['id'] = this.uid !== '0' ? this.uid : Util.createUid(this.uids)
-    //   // if (!group.members) group.members = '[]'
-    //   console.log('submit form', group)
-    //   this.$store.dispatch('updateGroup', group)
+    },
+    submit: function () {
+      console.log('submit form')
+      let data = {}
+      for (let k in this.group) {
+        data[k] = this.group[k].text
+      }
+      let group = new Group(data)
+      // for (var k in this.group) {
+      //   obj[k] = this.group[k].text
+      // }
+      group['role'] = this.role.text
+      group['id'] = this.$store.state.uid !== '0' ? this.$store.state.uid : Util.createUid(this.$store.state.uids)
+      // if (!group.members) group.members = '[]'
+      console.log('submit form', group)
+      this.$store.dispatch('updateGroup', group)
     }
   }
 }

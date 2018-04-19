@@ -31,7 +31,7 @@
          </v-card>
        </v-dialog>
     </v-toolbar>
-    <v-expansion-panel >
+    <v-expansion-panel popout>
       <v-expansion-panel-content v-for="(l, i) in list" :key="i" v-model="selections[i]">
         <div slot="header">{{ l.header }}
           <v-icon v-if="l.icon">{{ l.icon }}</v-icon>
@@ -72,7 +72,7 @@
     components: {
     },
     mounted: function () {
-      // this.selections = Array.from(this.list, () => (false))
+      this.selections = Array.from(this.list, () => (false))
       // console.log('TbList mounted')
     },
     watch: {
@@ -84,6 +84,7 @@
       // },
       'selections': {
         handler: function (val, oldVal) {
+          console.log('TBList selections handler', val)
           this.selectedIndex = val.findIndex((e) => (e))
           console.log('selections handler', this.selectedIndex)
           this.$emit('tblistevent', new Tbevent('selected', this.selectedIndex))

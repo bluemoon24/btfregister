@@ -1,17 +1,13 @@
 <template>
   <div>
     <tb-list
-    title="VIP Editor"
-    :list="list"
-    add_icon='person_add'
-    :actions="[{ id: 'submit', label: 'submit', close: true }, { id: 'cancel', label: 'cancel', close: true }]"
-    v-on:tblistevent="handleListEvents"
+        :title="`VIP Editor ${selected.name}` "
+        :list="list"
+        add_icon='person_add'
+        :actions="[{ id: 'submit', label: 'submit', close: true }, { id: 'cancel', label: 'cancel', close: true }]"
+        v-on:tblistevent="handleListEvents"
       >
-      <account-form
-        :vip.sync="selected"
-        slot-scope='props'
-      />
-
+        <account-form :vip="selected" slot-scope='props'></account-form>
     </tb-list>
   </div>
 </template>
@@ -49,6 +45,7 @@
     computed: {
       list: function () {
         let st = this.$store.state.uids
+        console.log('list function', st)
         if (this.newgroup) st = st.concat([this.newgroup])
         return st.map((m) => ({ item: m, header: m.name, icon: null }))
       }
@@ -67,8 +64,14 @@
           case 'selected':
             this.selectedIndex = e.payload
             if (this.selectedIndex >= 0) {
-              this.selected = this.list[e.payload].item
-              console.log('handleListevent adminnew', this.selected)
+              this.selected = Object.assign(this.selected, this.list[e.payload].item)
+              console.log('handleListevent adminnew 1', this.selected.name, e.payload)
+              this.$store.dispatch('getUserData', this.selected.id)
+              // this.selected = Object.assign(this.selected, this.$store.state.udata)
+              console.log('handleListevent adminnew 2', this.$store.state.uid)
+            } else {
+              console.log('handleListevent selectedIndex < 0')
+              this.$store.dispatch('getUserData', 0)
             }
             break
           case 'add':

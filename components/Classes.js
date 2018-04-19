@@ -45,7 +45,7 @@ export class Group {
     // const fields = ['name', 'email', 'mobile', 'role', 'url',
     //   'postaladdress', 'members', 'socials', 'publicity', 'travel', 'eventinfo']
     clone(this, data, ['id', 'name', 'email', 'mobile', 'role', 'url', 'postaladdress', 'comments'])
-    this.name = 'New'
+    // this.name = 'New'
     //   } else if (k === 'socials') {
     //   } else if (k === 'publicity') {
     //   } else if (k === 'travel') {

@@ -177,7 +177,7 @@ export const actions = {
   async getUids ({commit, state}) {
     let statements = {
       statements: [
-        { statement: 'MATCH (g:Group) RETURN {id:g.id, privileged: g.privileged, name: g.name}' }
+        { statement: 'MATCH (g:Group) RETURN {id:g.id, privileged: g.privileged, name: g.name, email: g.email, mobile: g.mobile, role: g.role, comments: g.comments}' }
       ]
     }
     const { data } = await NEO.post('', statements)
@@ -574,7 +574,7 @@ export const actions = {
 
   async getUserData ({ commit, state }, uid) {
     var p = state.privileged
-    if (!state.uid) state.uid = uid
+    // if (!state.uid) state.uid = uid
     console.log('getUserData (from NEO)', uid)
     if (uid > '0') {
       let statements = {
