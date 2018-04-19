@@ -2,7 +2,7 @@
   <div>
     <v-card>
       <v-card-title>
-        {{ (location ? location.name : '') }}
+        <h3>{{ (location ? location.name : '') }} {{ (target ? ' to ' + target.name : '') }}</h3>
       </v-card-title>
       <v-card-text>
         <iframe
@@ -26,6 +26,10 @@
       location: {
         type: Object
       },
+      target: {
+        type: Object,
+        default: null
+      },
       show: {
         type: Boolean
       }
@@ -37,12 +41,21 @@
     },
     computed: {
       mapsUrl: function () {
-        console.log('mapsdialog', this.location)
+        console.log('mapsdialog', this.location, this.target)
         if (!this.location) return
-        const baseURL = 'https://www.google.com/maps/embed/v1/place?key=AIzaSyDvzFijrwdV5DqXYAp1mspYWjN4vK5Z4AI&q='
-        // this.loc = this.$store.state.locationData.find((e) => (e.id === this.locid))
-        if (this.location.placeid) return baseURL + 'place_id:' + this.location.placeid
-        else return baseURL + this.location.address.split(/\s/m).join('+')
+        let baseURL = ''
+        if (this.target) {
+          baseURL = 'https://www.google.com/maps/embed/v1/directions?key=AIzaSyDvzFijrwdV5DqXYAp1mspYWjN4vK5Z4AI' +
+          '&origin=place_id:' + this.location.placeid +
+          '&destination=place_id:' + this.target.placeid
+        } else {
+          baseURL = 'https://www.google.com/maps/embed/v1/place?key=AIzaSyDvzFijrwdV5DqXYAp1mspYWjN4vK5Z4AI&q='
+          // this.loc = this.$store.state.locationData.find((e) => (e.id === this.locid))
+          if (this.location.placeid) baseURL = baseURL + 'place_id:' + this.location.placeid
+          else baseURL = baseURL + this.location.address.split(/\s/m).join('+')
+        }
+        console.log('map baseurl', baseURL)
+        return baseURL
       }
     }
   }

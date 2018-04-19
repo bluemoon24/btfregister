@@ -7,7 +7,7 @@
       fixed
       app
     >
-    Uid {{ $store.state.uid }}, realUid {{ $store.state.realUid }}, privileged {{ $privileged }}
+    <!-- Uid {{ $store.state.uid }}, realUid {{ $store.state.realUid }}, privileged {{ $privileged }} -->
     <v-toolbar>
       <v-toolbar-title>{{ $store.state.udata.name
         + ($privileged ? ' (admin)' : '')}}</v-toolbar-title>
@@ -20,7 +20,7 @@
       <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
     </v-btn>
     </v-toolbar>
-    Params {{ $route.params.id }}
+    <!-- Params {{ $route.params.id }} -->
       <v-list>
         <v-list-tile
           router
@@ -61,23 +61,22 @@
       </v-btn> -->
       <v-toolbar-title v-text="title"></v-toolbar-title>
       <v-spacer></v-spacer>
-      <div v-if="$privileged">
+      <!-- <div v-if="$privileged"> -->
       <span>{{ $store.state.udata.name }}</span>
-      <v-menu :nudge-width="300">
+      <!-- <v-menu :nudge-width="300">
           <v-toolbar-side-icon slot="activator">
           <v-icon color="red">account_box</v-icon>
         </v-toolbar-side-icon>
 
         <v-list>
-          <!-- <template v-for="item in [{id: '0', name: '<create new>'}, {id: '-1', name: '<delete current>'}].concat($store.state.uids)" > -->
           <template v-for="item in [{id: '0', name: '<create new>'}, {id: '-1', name: '<delete current>'}].concat($store.state.uids)" >
           <v-list-tile @click="switchToUid(item.id)" :key="item.id">
             <v-list-tile-title v-text="item.name" ></v-list-tile-title>
           </v-list-tile>
         </template>
         </v-list>
-      </v-menu>
-    </div>
+      </v-menu> -->
+    <!-- </div> -->
       <!-- <v-btn
         icon
         @click.stop="rightDrawer = !rightDrawer"
@@ -158,6 +157,7 @@
           this.items.push({ icon: 'info', title: 'Timeline', to: '/' + this.$route.params.id + '/eventinfo' })
         }
         if (this.$privileged) {
+          this.items.push({ icon: 'edit', title: 'Edit Events', to: '/' + this.$route.params.id + '/eventeditor' })
           this.items.push({ icon: 'location_searching', title: 'Edit Locations', to: '/' + this.$route.params.id + '/locations' })
           this.items.push({ icon: 'account_box', title: 'Admin', to: '/' + this.$route.params.id + '/admin' })
         }

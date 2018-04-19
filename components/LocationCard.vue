@@ -1,36 +1,29 @@
 <template>
   <div>
-    <v-form >
-      <v-dialog :showMap="mapShown" v-model="mapShown" lazy max-width="650px">
-        <map-dialog :location="location" v-on:mapclosed="mapShown = false"/>
-      </v-dialog>
-
-        <v-text-field
-          label="name"
-          v-model="location.name"
-          editable
-          />
-        <v-text-field
-        label="address"
-        v-model="location.address"
-        @blur="getMaploc"
-        multi-line
-      />
-      <v-progress-linear :active="showProgress" :indeterminate="true"></v-progress-linear>
-      <v-text-field
-        label="phone"
-        v-model="location.phone"
-      />
-        <v-select
-        :items="[
-        {text: 'Accomodation', value: 'accomodation'},
-        {text: 'Event/Workshop', value: 'event'},
-        {text: 'Other', value: 'other'}]"
-        v-model="location.type"
-        label="Location type"
-        ></v-select>
-  </v-form>
-  </div>
+    <!-- <v-container> -->
+      <v-layout column class="mx-0 px-0">
+        <v-flex>
+          <v-card>
+            <!-- <v-card-title>{{location.name}}</v-card-title> -->
+              <v-dialog :showMap="mapShown" v-model="mapShown" lazy max-width="650px">
+                <map-dialog :location="location" v-on:mapclosed="mapShown = false"/>
+              </v-dialog>
+              <v-card-text>
+                <h4>Address
+                  <v-btn flat small icon @click="mapShown = true">
+                    <v-icon>map</v-icon>
+                  </v-btn>
+                </h4>
+                  {{location.address ? location.address.split('\n')[0] : '' }}<br/>
+                  {{location.address && location.address.length > 1 ? location.address.split('\n')[1] : '' }}
+                  <br/>
+                Phone: {{ location.phone || 'none'}}
+              </v-card-text>
+            </v-card>
+          </v-flex>
+        </v-layout>
+      <!-- </v-container> -->
+    </div>
 </template>
 
 <script>
@@ -77,6 +70,7 @@
       }
     },
     computed: {
+      // address: function () { return this.location.address )},
       hasaddress: function () { return this.location.address.length > 1 },
       showtheMap: {
         get: () => (this.showMap),
@@ -84,6 +78,9 @@
       }
     },
     methods: {
+      getaddresshtml: function (addr) {
+        return addr.replace('\n', '<br />')
+      },
       getPlaceId: function (url, obj) {
         // Festsaal der Rheinischen Landeskliniken
         // Kaiser-Karl-Ring 20

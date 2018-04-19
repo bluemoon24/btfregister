@@ -3,7 +3,7 @@
     <v-form v-model="valid">
       <v-radio-group v-model="role.text" :label="role.label" :rules="[rules.required]">
         <v-layout wrap>
-          <v-flex xs4 md3 v-for="o in role.options">
+          <v-flex xs4 md3 v-for="o in role.options" :key="o.value">
             <v-radio :label="o.text" :value="o.value" ></v-radio>
           </v-flex>
         </v-layout>

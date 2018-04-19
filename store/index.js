@@ -6,6 +6,7 @@ import Auth from '../mixins/Auth'
 Vue.mixin(Auth)
 
 // let Neo4j = require('simple-neo4j')
+console.log = function () {} // supress console in production
 
 export const HTTP = {
   get: function (what) {

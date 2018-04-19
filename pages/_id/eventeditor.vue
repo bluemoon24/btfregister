@@ -1,19 +1,20 @@
 <template>
   <div>
     <v-toolbar height="100em">
-      <v-flex xs12 class="pr-3">
+      <v-flex xs6 class="pr-3">
       <v-text-field
-        label="Search"
+        label="Filter"
         solo
         flat lazy
         v-model="filter"
         >
       </v-text-field>
       </v-flex>
-        <v-spacer />
-      <v-flex xs12 class="pr-3">
+    </v-toolbar>
+    <v-toolbar>
+      <v-flex xs12>
          <v-select
-           label="Weekday"
+           label="Select"
            :items="[
             {text: 'Thursday', value: '2018-04-26'},
             {text: 'Friday', value: '2018-04-27'},
@@ -29,9 +30,6 @@
            persistent-hint
          ></v-select>
        </v-flex>
-       <v-flex xs4>
-         <v-checkbox label="all" v-model="alluids"></v-checkbox>
-       </v-flex>
       <!-- <v-checkbox label="Thu" value='2018-04-26' v-model="filteredDays"></v-checkbox>
       <v-checkbox label="Fri" value='2018-04-27' v-model="filteredDays"></v-checkbox>
       <v-checkbox label="Sat" value='2018-04-28' v-model="filteredDays"></v-checkbox>
@@ -42,13 +40,23 @@
   </v-toolbar>
 
     <tb-list
-      title='Festival Timeline'
+      title='Events'
+      add_icon='playlist_add'
+      :showdelete="true"
       :list="list"
+      :actions="$privileged ? [{ id: 'submit', label: 'submit', close: true }, { id: 'cancel', label: 'cancel', close: true }] : ''"
       v-on:tblistevent="handleListEvents"
       >
-      <eventinfo-card
-        :eventinfo="selected"
-        :type="type"
+      <!-- <travel-form
+        :eventinfo.sync="selected"
+        :type.sync="type"
+        :locations="$store.state.locationData"
+        slot-scope='props'
+      /> -->
+
+      <eventinfo-form
+        :eventinfo.sync="selected"
+        :type.sync="type"
         :locations="$store.state.locationData"
         slot-scope='props'
       />
@@ -59,18 +67,18 @@
 <script>
   import TbList from '~/components/TbList.vue'
   import { Eventinfo } from '~/components/Classes.js'
-  // import EventinfoForm from '~/components/EventinfoForm.vue'
+  import EventinfoForm from '~/components/EventinfoForm.vue'
   import EventinfoCard from '~/components/EventinfoCard.vue'
 
   export default {
     components: {
-      TbList, EventinfoCard
+      TbList, EventinfoForm, EventinfoCard
     },
 
-    // watch: {
-    //   '$store.state.eventinfoData': 'update'
-    // },
-    //
+    watch: {
+      '$store.state.eventinfoData': 'update'
+    },
+
     async fetch ({ store, params, redirect }) {
       if (!store.state.uids.some(e => e.id === params.id)) return redirect('/')
       await store.dispatch('getUserData', store.state.uid || params.id)
@@ -79,8 +87,7 @@
       console.log('async fetch eventinfo', store.state.eventinfoData)
     },
     created: function () {
-      this.eventinfoList = Array.from(this.$store.state.eventinfoData, (evt) => (new Eventinfo(evt)))
-      this.alluids = this.$privileged
+      this.update()
     },
     computed: {
       list: function () {
@@ -88,7 +95,7 @@
         console.log('filteredDays', this.filteredDays.join(), '|', this.filteredDays.length, '|', this.$store.state.realUid)
         return this.eventinfoList.filter((e) => (
           e.toSearch().search(this.filter.toLowerCase()) >= 0 &&
-          (this.alluids || e.involvedUids().indexOf(this.$store.state.uid) >= 0) &&
+          // (this.alluids || e.involvedUids().indexOf(this.$store.state.uid) >= 0) &&
           (this.filteredDays.join().search(e.starts.split(' ')[0]) >= 0 || this.filteredDays.length <= 0)
         )
         ).map((evt) => ({
@@ -106,14 +113,14 @@
         filterMe: '',
         todayOnly: false,
         futureOnly: false,
-        alluids: false,
+        // alluids: false,
         eventinfoList: [],
         filteredDays: []
       }
     },
     methods: {
       update: function () {
-        // this.eventinfoList = Array.from(this.$store.state.eventinfoData, (evt) => (new Eventinfo(evt)))
+        this.eventinfoList = Array.from(this.$store.state.eventinfoData, (evt) => (new Eventinfo(evt)))
       },
       handleListEvents: function (e) {
         console.log('listevent', e)
@@ -122,6 +129,23 @@
             this.selectedIndex = e.payload
             if (this.selectedIndex >= 0) {
               this.selected = this.eventinfoList.find(e => e.id === this.list[this.selectedIndex].item.id)
+              // console.log('eventinfo:update', e.payload, this.list[this.selectedIndex].item, 'id=', this.list[this.selectedIndex].item.id, this.selected)
+            }
+            break
+          case 'add':
+            this.eventinfoList = this.eventinfoList || []
+            this.eventinfoList.push(new Eventinfo())
+            break
+          case 'delete':
+            this.$store.dispatch('deleteEventinfoData', this.selected.id)
+            break
+          case 'action':
+            if (e.payload.action === 'submit') {
+              // let ev = new Eventinfo(this.selected)
+              // ev.involved = JSON.stringify(e.payload.item.involved)
+              console.log('updateEventinfoData:submit', this.selected)
+              this.$store.dispatch('updateEventinfoData', this.selected)
+            // console.log('submitevent', this.selected)
             }
             break
         }

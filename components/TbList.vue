@@ -13,23 +13,26 @@
         >
       </v-text-field>
       <!-- <v-spacer/> -->
-      <v-toolbar-side-icon @click="addItem">
+      <v-toolbar-side-icon @click="addItem" v-if="add_icon">
         <v-icon>{{ add_icon }}</v-icon>
       </v-toolbar-side-icon>
 
-      <v-dialog v-model="dialog" persistent max-width="290">
-        <v-toolbar-side-icon  slot="activator" :disabled="selectedIndex < 0">
-          <v-icon>delete</v-icon>
-        </v-toolbar-side-icon>
-         <v-card>
-           <v-card-title class="headline">Confirm delete</v-card-title>
-           <v-card-actions>
-             <v-spacer></v-spacer>
-             <v-btn flat @click.native="dialog = false">Cancel</v-btn>
-             <v-btn flat @click="dialog = false; deleteItem()">Delete</v-btn>
-           </v-card-actions>
-         </v-card>
-       </v-dialog>
+      <div v-if="showdelete">
+        <v-dialog v-model="dialog" persistent max-width="290" v-if="showdelete">
+          <v-toolbar-side-icon  slot="activator" :disabled="selectedIndex < 0" v-if="showdelete">
+            <v-icon>delete</v-icon>
+          </v-toolbar-side-icon>
+           <v-card>
+             <v-card-title class="headline">Confirm delete</v-card-title>
+             <v-card-actions>
+               <v-spacer></v-spacer>
+               <v-btn flat @click.native="dialog = false">Cancel</v-btn>
+               <v-btn flat @click="dialog = false; deleteItem()">Delete</v-btn>
+             </v-card-actions>
+           </v-card>
+         </v-dialog>
+     </div>
+
     </v-toolbar>
     <v-expansion-panel popout>
       <v-expansion-panel-content v-for="(l, i) in list" :key="i" v-model="selections[i]">
@@ -56,7 +59,7 @@
   // import { TbListContent } from '~/components/TbListContent.vue'
 
   export default {
-    props: ['list', 'title', 'add_icon', 'actions', 'filter', 'showfilter'],
+    props: ['list', 'title', 'add_icon', 'actions', 'filter', 'showfilter', 'showdelete'],
     name: 'tb-list',
     // computed: {,
     //   elist = list.map((e) => (e['selected']))
