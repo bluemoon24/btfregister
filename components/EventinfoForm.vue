@@ -19,8 +19,9 @@
           {text: 'Workshop', value: 'workshop'},
           {text: 'Performance (Show, Concert)', value: 'performance'},
           {text: 'Soundcheck', value: 'soundcheck'},
-          {text: 'Construction', value: 'constraction'},
-          {text: 'Travel and Transport', value: 'tnt'}]"
+          {text: 'Construction', value: 'construction'},
+          {text: 'Travel and Transport', value: 'tnt'},
+          {text: 'Other', value: 'other'}]"
           @input="changeType"
           v-model="selectedType"
           label="Event type"

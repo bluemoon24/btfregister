@@ -1,7 +1,7 @@
 export default {
   computed: {
     $privileged () {
-      let uid = this.$store.state.uids.find(e => e.id === this.$route.params.id)
+      let uid = this.$store.state.uids.find(e => e.id === this.$store.state.uid)
       return uid !== undefined && uid.privileged
     },
     $canedit () {

@@ -1,7 +1,7 @@
 <template>
   <div>
-    Welcome, {{ name }}! (index.vue)
-    {{ members }}
+    Welcome, {{ name }}!
+    <!-- {{ members }} -->
   </div>
 </template>
 

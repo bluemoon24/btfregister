@@ -73,7 +73,8 @@
     //
     async fetch ({ store, params, redirect }) {
       if (!store.state.uids.some(e => e.id === params.id)) return redirect('/')
-      await store.dispatch('getUserData', store.state.uid || params.id)
+      await store.dispatch('getUserData', params.id)
+      await store.dispatch('setRealUser', params.id)
       await store.dispatch('getLocationData')
       await store.dispatch('getEventinfoData')
       console.log('async fetch eventinfo', store.state.eventinfoData)

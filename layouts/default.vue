@@ -1,4 +1,4 @@
-<template>
+store.state.uidthis.$store.state.uid<template>
   <v-app light>
     <v-navigation-drawer
       :mini-variant.sync="miniVariant"
@@ -89,7 +89,7 @@
       </v-container>
     </v-content>
     <v-footer :fixed="fixed" app>
-      <span>&copy; 2017</span>
+      <span>&copy; Tangofestival Bonn 2018</span>
     </v-footer>
   </v-app>
 </template>
@@ -127,39 +127,40 @@
       this.update()
     },
     methods: {
-      switchToUid: function (uid) {
-        console.log('switch to', uid, this.$route.params.id)
-        this.$store.dispatch('setRealUser', this.$route.params.id)
-        if (uid < 0) {
-          console.log('delete current account', this.$store.state.uid)
-          this.$store.dispatch('deleteGroup', this.$store.state.uid)
-        } else if (uid === '0' || !uid) {
-          console.log('switch to, uid is 0, route:/' + this.$route.params.id + '/account')
-          this.$router.push({path: '/' + this.$route.params.id + '/account'})
-          this.$store.dispatch('getUserData', 0)
-        } else {
-          this.$store.dispatch('getUserData', uid)
-        }
-      },
+      // switchToUid: function (uid) {
+      //   console.log('switch to', uid, this.$route.params.id)
+      //   this.$store.dispatch('setRealUser', this.$route.params.id)
+      //   if (uid < 0) {
+      //     console.log('delete current account', this.$store.state.uid)
+      //     this.$store.dispatch('deleteGroup', this.$store.state.uid)
+      //   } else if (uid === '0' || !uid) {
+      //     console.log('switch to, uid is 0, route:/' + this.$route.params.id + '/account')
+      //     this.$router.push({path: '/' + this.$route.params.id + '/account'})
+      //     this.$store.dispatch('getUserData', 0)
+      //   } else {
+      //     this.$store.dispatch('getUserData', uid)
+      //   }
+      // },
       update: function () {
+        this.$store.dispatch('getUserData', this.$store.state.uid)
         console.log('mixins', this.$privileged, this.$canedit, this.$validuser, this.$route.params.id)
-        console.log('default:update', this.$store.state.uid ? 'uid true' : 'uid false', ':', this.$route.params.id)
+        console.log('default:update uid:', this.$store.state.uid, 'params.id', this.$route.params.id)
         // let uid = this.$store.state.uid || this.$route.params.id
         // if (this.$route.params.id) this.$router.push({path: '/'})
         // console.log('***update ', uid, this.$store.state.uids.find((e) => (e.id === uid)))
         // this.user = this.$store.state.uids.find((e) => (e.id === uid))
-        this.items = [ { icon: 'apps', title: 'Welcome', to: '/' + this.$route.params.id } ]
+        this.items = [ { icon: 'apps', title: 'Welcome', to: '/' + this.$store.state.uid } ]
         this.name = (this.$store.state.uid ? this.$store.state.udata.name : 'New')
         if (this.$store.state.uid || this.$privileged) {
-          this.items.push({ icon: 'account_circle', title: 'Account', to: '/' + this.$route.params.id + '/account' })
-          this.items.push({ icon: 'details', title: 'Details', to: '/' + this.$route.params.id + '/details' })
-          // this.items.push({ icon: 'card_travel', title: 'Travel', to: '/' + this.$route.params.id + '/travel' })
-          this.items.push({ icon: 'info', title: 'Timeline', to: '/' + this.$route.params.id + '/eventinfo' })
+          this.items.push({ icon: 'account_circle', title: 'Account', to: '/' + this.$store.state.uid + '/account' })
+          this.items.push({ icon: 'details', title: 'Details', to: '/' + this.$store.state.uid + '/details' })
+          // this.items.push({ icon: 'card_travel', title: 'Travel', to: '/' + this.$store.state.uid + '/travel' })
+          this.items.push({ icon: 'info', title: 'Timeline', to: '/' + this.$store.state.uid + '/eventinfo' })
         }
         if (this.$privileged) {
-          this.items.push({ icon: 'edit', title: 'Edit Events', to: '/' + this.$route.params.id + '/eventeditor' })
-          this.items.push({ icon: 'location_searching', title: 'Edit Locations', to: '/' + this.$route.params.id + '/locations' })
-          this.items.push({ icon: 'account_box', title: 'Admin', to: '/' + this.$route.params.id + '/admin' })
+          this.items.push({ icon: 'edit', title: 'Edit Events', to: '/' + this.$store.state.uid + '/eventeditor' })
+          this.items.push({ icon: 'location_searching', title: 'Edit Locations', to: '/' + this.$store.state.uid + '/locations' })
+          this.items.push({ icon: 'account_box', title: 'Admin', to: '/' + this.$store.state.uid + '/admin' })
         }
         // console.log('layout updated', this.$store.state.uids, this.$store.state.privileged)
       }

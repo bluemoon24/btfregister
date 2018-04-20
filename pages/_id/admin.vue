@@ -32,6 +32,10 @@
         <td><a :href="'mailto:' + props.item.email">{{ props.item.email }}</a></td>
         <td>{{ props.item.mobile }}</td>
         <td class="justify-center layout px-0">
+          <v-btn icon class="mx-0" nuxt @click="$router.push('/' + props.item.id + '/eventinfo')">
+          <!-- <v-btn icon class="mx-0" nuxt :to="'/' + props.item.id + '/eventinfo'"> -->
+            <v-icon color="teal">timeline</v-icon>
+          </v-btn>
           <v-btn icon class="mx-0" @click="editItem(props.item)">
             <v-icon color="teal">edit</v-icon>
           </v-btn>
@@ -128,8 +132,8 @@
       async editItem (item) {
         await this.$store.dispatch('getUserData', item.id)
         this.editedIndex = this.list.indexOf(item)
-        console.log('editItem 1', item.id, this.$store.state.udata, this.editedIndex)
-        this.editedItem = Object.assign({}, this.$store.state.udata)
+        this.editedItem = new Group(this.$store.state.udata)
+        console.log('editItem 1', item.id, this.$store.state.udata, this.editedItem)
         this.dialog = true
       },
 

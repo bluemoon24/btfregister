@@ -74,9 +74,9 @@
           workshop: 'Workshop',
           performance: 'Performance (Show, Concert)',
           soundcheck: 'Soundcheck',
-          constraction: 'Construction',
           construction: 'Construction',
-          tnt: 'Travel/Transport'
+          tnt: 'Travel/Transport',
+          other: 'Other'
         },
         mapShown: false
       }

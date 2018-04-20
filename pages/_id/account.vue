@@ -1,6 +1,6 @@
 <template>
   <div>
-    <account-form :vip="$store.state.udata"></account-form>
+    <account-form :vip="vip" :showActions="true"></account-form>
 </div>
 </template>
 
@@ -21,6 +21,11 @@ export default {
     console.log('account.vue', store.state.privileged)
     if (!store.state.uids.some(e => e.id === params.id)) return redirect('/')
     await store.dispatch('getUserData', params.id)
+  },
+  computed: {
+    vip: function () {
+      return Object.assign({}, this.$store.state.udata)
+    }
   },
   methods: {
     // submit: function () {

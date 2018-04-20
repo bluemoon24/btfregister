@@ -21,16 +21,26 @@
         editable
       />
     </v-form>
-    <!-- <v-btn :disabled="!valid" color="primary" @click="submit" flat nuxt >submit</v-btn> -->
-    <!-- <v-btn color="primary" to="eventinfo" flat nuxt >Event</v-btn> -->
+    <div v-if="showActions">
+    <v-btn :disabled="!valid" color="primary" @click="submit" flat nuxt >submit</v-btn>
+    <!-- <v-btn color="primary" @click="submit" flat nuxt >submit</v-btn> -->
+  </div>
   </div>
 </template>
 
 <script>
-// import { Group } from '~/components/Classes.js'
+import { Group } from '~/components/Classes.js'
 export default {
   name: 'account-form',
-  props: ['vip'],
+  props: {
+    vip: {
+      type: Object
+    },
+    showActions: {
+      type: Boolean,
+      default: false
+    }
+  },
   data () {
     return {
       valid: false,
@@ -155,22 +165,23 @@ export default {
       //   case 'url': return [this.rules.url]
       // }
       return []
-    // },
-    // submit: function () {
-    //   console.log('submit form')
-    //   let data = {}
-    //   for (let k in this.group) {
-    //     data[k] = this.group[k].text
-    //   }
-    //   let group = new Group(data)
-    //   // for (var k in this.group) {
-    //   //   obj[k] = this.group[k].text
-    //   // }
-    //   group['role'] = this.role.text
-    //   group['id'] = this.uid !== '0' ? this.uid : Util.createUid(this.uids)
-    //   // if (!group.members) group.members = '[]'
-    //   console.log('submit form', group)
-    //   this.$store.dispatch('updateGroup', group)
+    },
+    submit: function () {
+      console.log('submit form')
+      let data = {}
+      for (let k in this.group) {
+        data[k] = this.group[k].text
+      }
+      let group = new Group(data)
+      // for (var k in this.group) {
+      //   obj[k] = this.group[k].text
+      // }
+      group['role'] = this.role.text
+      group['id'] = this.vip.id // !== '0' ? this.uid : Util.createUid(this.uids)
+      // if (!group.members) group.members = '[]'
+      console.log('submit form', group)
+      if (this.vip.id) this.$store.dispatch('updateGroup', group)
+      else console.log('AccountForm.submit: No vip.id')
     }
   }
 }
