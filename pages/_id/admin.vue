@@ -19,6 +19,19 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="taxid" max-width="800px" width="800px">
+      <v-btn color="primary" slot="activator" class="mb-2">Taxi list</v-btn>
+      <v-card>
+        <v-btn @click="copyToClipboard">Copy</v-btn>
+        <v-card-text>
+        <textarea ref='taxilist' style='width:100%; height:600px;'>
+          {{ taxilist }}
+        </textarea>
+      </v-card-text>
+      </v-card>
+    </v-dialog>
+
     <v-data-table
       :headers="headers"
       :items="list"
@@ -65,11 +78,13 @@
         return redirect('/' + params.id)
       } else {
         store.dispatch('setRealUser', params.id)
+        store.dispatch('getEventinfoData')
       }
     },
 
     data: () => ({
       dialog: false,
+      taxid: false,
       headers: [
         {
           text: 'ID',
@@ -91,6 +106,11 @@
     computed: {
       formTitle () {
         return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+      },
+      taxilist: function () {
+        return this.$store.state.eventinfoData.filter(e => e.type === 'tnt')
+          .map(el => (`${el.location.name}\t ${el.location.address.replace(/\n/g, ', ')}\t ${el.targetloc.name}\t ${el.targetloc.address.replace(/\n/g, ', ')}`))
+          .join('\n')
       },
       list: function () {
         console.log('list function computed')
@@ -119,6 +139,18 @@
         ]
       },
 
+      copyToClipboard: function () {
+        console.log('copyToClipboard', this.$refs.taxilist)
+        // var copyText = document.getElementById("myInput");
+
+        /* Select the text field */
+        this.$refs.taxilist.select()
+
+        /* Copy the text inside the text field */
+        document.execCommand('Copy')
+        // document.selection.empty()
+        this.taxid = false
+      },
       vipChanged: function (e) {
         console.log('vip changed', e, this.$event)
       },
