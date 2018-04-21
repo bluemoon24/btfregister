@@ -150,7 +150,7 @@
       multiple
       :items="parties"
       v-model="involved"
-      @input="changeInvolved"
+      @change="changeInvolved"
       ></v-select>
     </v-flex>
 
@@ -239,7 +239,10 @@
       changeDescription: function (newval) { this.eventinfo.evtdescription = newval },
       changeLocation: function (newval) { this.eventinfo.location = newval },
       changeTargetLoc: function (newval) { this.eventinfo.targetloc = newval },
-      changeInvolved: function (newval) { this.eventinfo.involved = newval },
+      changeInvolved: function (newval) {
+        console.log('newval involved', newval)
+        this.eventinfo.involved = newval
+      },
       changeStartime: function (newval) {
         console.log('changeStartime', newval)
         this.eventinfo.starts = newval

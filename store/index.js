@@ -220,7 +220,10 @@ export const actions = {
     console.log('setEventInvolved', gid)
     let statements = {
       statements: [
+        { statement: 'MATCH (e:Eventinfo {id: "' + evid + '"}), (g:Group), (e)-[r:INVOLVES]->(g) DETACH DELETE r' },
         { statement: 'MATCH (e:Eventinfo {id: "' + evid + '"}), (g:Group) WHERE g.id IN [' + gid + '] MERGE (e)-[r:INVOLVES]->(g) RETURN e,g' },
+
+        { statement: 'MATCH (e:Eventinfo {id: "' + evid + '"}), (g:Group), (g)-[r:INVOLVEDIN]->(e) DETACH DELETE r' },
         { statement: 'MATCH (e:Eventinfo {id: "' + evid + '"}), (g:Group) WHERE g.id IN [' + gid + '] MERGE (g)-[r:INVOLVEDIN]->(e) RETURN e,g ' }
       ]
     }

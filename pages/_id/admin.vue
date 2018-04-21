@@ -108,9 +108,12 @@
         return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
       },
       taxilist: function () {
-        return this.$store.state.eventinfoData.filter(e => e.type === 'tnt')
-          .map(el => (`${el.location.name}\t ${el.location.address.replace(/\n/g, ', ')}\t ${el.targetloc.name}\t ${el.targetloc.address.replace(/\n/g, ', ')}`))
-          .join('\n')
+        let table = this.$store.state.eventinfoData.filter(e => e.type === 'tnt')
+          .map(el => (`${el.starts.replace(' ', '\t ')}\t ${el.location.name}\t ${el.location.address.replace(/\n/g, ', ')}\t` +
+          `${el.targetloc.name}\t ${el.targetloc.address.replace(/\n/g, ', ')}\t` +
+          `${el.involved.filter(e => (e.role !== 'other')).map(e => e.name).join(', ')}`))
+        // table.unshift('Date\t Time\t From\t Address\t To\t Address\t Who')
+        return table.join('\n')
       },
       list: function () {
         console.log('list function computed')

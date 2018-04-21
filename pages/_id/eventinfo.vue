@@ -21,7 +21,7 @@
             {text: 'Sunday', value: '2018-04-29'},
             {text: 'Monday', value: '2018-04-30'},
             {text: 'Tuesday', value: '2018-05-01'},
-            {text: 'Wednesday', value: '2018-04-26'}
+            {text: 'Wednesday', value: '2018-05-02'}
             ]"
            v-model="filteredDays"
            multiple
@@ -40,7 +40,6 @@
       <v-checkbox label="Tue" value='2018-05-01' v-model="filteredDays"></v-checkbox>
       <v-checkbox label="Wed" value='2018-05-02' v-model="filteredDays"></v-checkbox> -->
   </v-toolbar>
-
     <tb-list
       title='Festival Timeline'
       :list="list"
@@ -82,6 +81,7 @@
     created: function () {
       this.eventinfoList = Array.from(this.$store.state.eventinfoData, (evt) => (new Eventinfo(evt)))
       this.alluids = this.$privileged
+      console.log('eventinfolist', this.eventinfoList, this.$store.state.eventinfoData)
     },
     computed: {
       list: function () {

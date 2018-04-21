@@ -3,18 +3,17 @@
     <v-toolbar height="100em">
       <v-flex xs6 class="pr-3">
       <v-text-field
-        label="Filter"
+        label="Search"
         solo
         flat lazy
         v-model="filter"
         >
       </v-text-field>
       </v-flex>
-    </v-toolbar>
-    <v-toolbar>
-      <v-flex xs12>
+      <v-spacer />
+      <v-flex  xs12 class="pr-3">
          <v-select
-           label="Select"
+           label="Weekday"
            :items="[
             {text: 'Thursday', value: '2018-04-26'},
             {text: 'Friday', value: '2018-04-27'},
@@ -22,7 +21,7 @@
             {text: 'Sunday', value: '2018-04-29'},
             {text: 'Monday', value: '2018-04-30'},
             {text: 'Tuesday', value: '2018-05-01'},
-            {text: 'Wednesday', value: '2018-04-26'}
+            {text: 'Wednesday', value: '2018-05-02'}
             ]"
            v-model="filteredDays"
            multiple
@@ -143,6 +142,7 @@
             if (e.payload.action === 'submit') {
               // let ev = new Eventinfo(this.selected)
               // ev.involved = JSON.stringify(e.payload.item.involved)
+              this.selected.involved = e.payload.item.involved
               console.log('updateEventinfoData:submit', this.selected)
               this.$store.dispatch('updateEventinfoData', this.selected)
             // console.log('submitevent', this.selected)
