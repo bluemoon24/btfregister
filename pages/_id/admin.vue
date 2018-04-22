@@ -39,7 +39,7 @@
       class="elevation-1"
     >
       <template slot="items" slot-scope="props">
-        <td><a :href="'../' + props.item.id + '/account'">{{ props.item.id }}</a></td>
+        <td><a :href="'../' + props.item.id">{{ props.item.id }}</a></td>
         <td>{{ props.item.name }}</td>
         <td>{{ props.item.role }}</td>
         <td><a :href="'mailto:' + props.item.email">{{ props.item.email }}</a></td>
