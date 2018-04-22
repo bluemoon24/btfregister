@@ -20,18 +20,20 @@
               You will see a navigation sidebar on the left side. If you are on a small screen this may have disappeared and can be called with the menu button on the
               upper left corner.
             </p>
-
-            <p>
               Here is a quick description:
               <ul style="margin-left:2em">
                 <li>'account' - Group information. Please check and make changes to correct it.</li>
                 <li>'details' - Person information. Please check make changes to correct it, especially for food intolerances, allergies etc.</li>
                 <li>'timeline' - You will most likely use this in the most cases. All pickup times, events, etc. are listed here.
-                You can also look at all festival events (not just yours), by checking the 'all' checkbox (be patient, it may take a while)</li>
+                You can also look at all festival events (not just yours), by checking the 'all' checkbox in the upper right (be patient, it may take a while)</li>
+                <li>'maps and routes' - when you see a map symbol for locations, click on it and the location will be shown in google maps</li>
               </ul>
-            </p>
           </v-card-text>
-          <v-btn outline :to="'/' + this.$store.state.uid + '/eventinfo'">Go to my timeline</v-btn>
+          <v-dialog v-if="canshow" max-width="600px">
+            <v-btn slot="activator" outline >My accomodation location</v-btn>
+            <location-card :location="this.accomodation" v-if="canshow"></location-card>
+        </v-dialog>
+        <v-btn outline :to="'/' + this.$store.state.uid + '/eventinfo'">My timeline</v-btn>
         </v-card>
       </v-flex>
     </v-layout>
@@ -41,6 +43,7 @@
 <script>
 
 import { mapState } from 'vuex'
+import LocationCard from '~/components/LocationCard.vue'
 
 export default {
   async fetch ({ store, params, redirect }) {
@@ -52,14 +55,23 @@ export default {
       return redirect('/')
     } else {
       let uid = store.state.uid || params.id
+      console.log('fetching userdata etc')
       await store.dispatch('getUserData', uid)
       await store.dispatch('getEventinfoData')
       await store.dispatch('getLocationData')
     }
   },
+  components: {
+    LocationCard
+  },
+  created: function () {
+    // console.log('getAccomodationData', this.$store.state.uid)
+    // this.$store.dispatch('getAccomodationData', this.$store.state.uid)
+  },
   computed: {
     ...mapState({
       name: state => (state.udata.name),
+      accomodation: state => (state.udata.accomodation),
       members: state => (state.udata.members)
     }),
     // ...mapGetters([
@@ -67,6 +79,9 @@ export default {
     // ])
     personData: function () {
       this.$store.state.personData.map((p) => ({id: p.id, name: p.name, allergies: p.allergies, instrument: p.instrument, mobile: p.mobile}))
+    },
+    canshow: function () {
+      return (this.accomodation && this.accomodation.address)
     }
   }
 }

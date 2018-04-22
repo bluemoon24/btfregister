@@ -90,6 +90,10 @@ export const mutations = {
     state.eventinfoData[idx].location = loc
     console.log('*******>>>>>>', state.eventinfoData)
   },
+  setAccomodationData (state, data) {
+    console.log('setAccomodationData', data)
+    state.udata.accomodation = data
+  },
 
   setLocationData (state, data) {
     state.locationData = data
@@ -407,8 +411,21 @@ export const actions = {
     await this.dispatch('getEventinfoData')
   },
 
+  // async getAccomodationData ({ commit, state }, uid) {
+  //   console.log('getAccomodationData (from NEO)')
+  //   let statements = {
+  //     statements: [
+  //       { statement: 'MATCH p=(g:Group)-[r:STAYSAT]->(l:Location) where g.id="' + uid + '" RETURN l' }
+  //     ]
+  //   }
+  //   console.log('getAccomodationData statements', statements)
+  //   const { data } = await NEO.post('', statements)
+  //   let results = Util.parseResult(data.results)
+  //   console.log('getAccomodationData results', results[0][0])
+  //   commit('setAccomodationData', results[0][0])
+  // },
+
   async getEventinfoData ({ commit, state }) {
-    console.log('getEventinfoData (from NEO)')
     let statements = {
       statements: [
         { statement: 'MATCH (e:Eventinfo) WITH e ORDER BY e.starts RETURN  e' },
@@ -591,6 +608,9 @@ export const actions = {
           },
           { statement: 'MATCH (g:Group {id: $uid})-[:MANAGEDBY]->(p:Person) RETURN  g, p',
             parameters: { uid: uid }
+          },
+          { statement: 'MATCH (g:Group {id: $uid})-[:STAYSAT]->(l:Location) RETURN g, l',
+            parameters: { uid: uid }
           }
         ]
       }
@@ -601,15 +621,18 @@ export const actions = {
       let results = Util.parseResult(data.results)
       let members = results[1] ? results[1].map((m) => (m.p)) : []
       let manager = results[2].length > 0 ? results[2][0].p : {}
+      let accomod = results[3].length > 0 ? results[3][0].l : {}
 
       // console.log('parsedResult', JSON.stringify(results))
       // console.log('****groups', results[0][0].g)
       // console.log('****members', members)
       // console.log('****managers', manager)
+      // console.log('****accomodation', accomod)
 
       commit('setUserData', results[0][0].g)
       commit('setMembers', [uid, members])
       commit('setManager', [uid, manager])
+      commit('setAccomodationData', accomod)
     } else {
       commit('clearUserData', p)
     }

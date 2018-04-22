@@ -21,12 +21,12 @@
     </v-dialog>
 
     <v-dialog v-model="taxid" max-width="800px" width="800px">
-      <v-btn color="primary" slot="activator" class="mb-2">Taxi list</v-btn>
+      <v-btn color="primary" slot="activator" @click="createTaxilist()" class="mb-2">Taxi list</v-btn>
       <v-card>
         <v-btn @click="copyToClipboard">Copy</v-btn>
         <v-card-text>
         <textarea ref='taxilist' style='width:100%; height:600px;'>
-          {{ taxilist }}
+          {{ tlist }}
         </textarea>
       </v-card-text>
       </v-card>
@@ -77,14 +77,15 @@
       if (!store.state.privileged) {
         return redirect('/' + params.id)
       } else {
-        store.dispatch('setRealUser', params.id)
-        store.dispatch('getEventinfoData')
+        await store.dispatch('setRealUser', params.id)
+        await store.dispatch('getEventinfoData')
       }
     },
 
     data: () => ({
       dialog: false,
       taxid: false,
+      tlist: '',
       headers: [
         {
           text: 'ID',
@@ -106,25 +107,6 @@
     computed: {
       formTitle () {
         return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
-      },
-      taxilist: function () {
-        console.log('taxilist  1', this.$store.state.eventinfoData)
-        let table = this.$store.state.eventinfoData.filter(e => e.type === 'tnt')
-          .map(el => (
-            { date: el.starts.split(' ')[0],
-              time: el.starts.split(' ')[1],
-              from: el.location.name,
-              faddr: el.location.address.replace(/\n/g, ', '),
-              to: el.targetloc.name,
-              taddr: el.targetloc.address.replace(/\n/g, ', '),
-              who: el.involved.filter(e => (e.role !== 'other' && e.role !== 'taxi')).map(e => e.name).join(', '),
-              driver: el.involved.filter(e => (e.role === 'taxi')).map(e => e.name).join(', ')
-            }))
-          .map(e => (`${e.date}\t ${e.time}\t ${e.from}\t ${e.faddr}\t ${e.to}\t ` +
-            `${e.taddr}\t ${e.who}\t ${e.driver}`))
-
-        // table.unshift('Date\t Time\t From\t Address\t To\t Address\t Who')
-        return table.join('\n')
       },
       list: function () {
         console.log('list function computed')
@@ -151,6 +133,31 @@
       initialize () {
         this.items = [
         ]
+      },
+
+      createTaxilist: function () {
+        console.log('taxilist  1', this.$store.state.eventinfoData)
+        if (!this.$store.state.eventinfoData) {
+          console.log('load eventinvoData first')
+          return
+        }
+        let table = this.$store.state.eventinfoData.filter(e => e.type === 'tnt')
+          .map(el => (
+            { date: el.starts.split(' ')[0],
+              time: el.starts.split(' ')[1],
+              from: el.location.name,
+              faddr: el.location.address.replace(/\n/g, ', '),
+              to: el.targetloc.name,
+              taddr: el.targetloc.address.replace(/\n/g, ', '),
+              who: el.involved ? el.involved.filter(e => (e && e.role !== 'other' && e.role !== 'taxi')).map(e => e.name).join(', ') : ['none'],
+              driver: el.involved ? el.involved.filter(e => (e && e.role === 'taxi')).map(e => e.name).join(', ') : ['none']
+            }))
+          .map(e => (`${e.date}\t ${e.time}\t ${e.from}\t ${e.faddr}\t ${e.to}\t ` +
+            `${e.taddr}\t ${e.who}\t ${e.driver}`))
+
+        // table.unshift('Date\t Time\t From\t Address\t To\t Address\t Who')
+        this.tlist = table.join('\n')
+        // console.log('taxilist 2', this.tl)
       },
 
       copyToClipboard: function () {

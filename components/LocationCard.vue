@@ -9,15 +9,16 @@
                 <map-dialog :location="location" v-on:mapclosed="mapShown = false"/>
               </v-dialog>
               <v-card-text>
+                <h2>{{ location.name }}</h2>
                 <h4>Address
-                  <v-btn flat small icon @click="mapShown = true">
-                    <v-icon>map</v-icon>
-                  </v-btn>
                 </h4>
                   {{location.address ? location.address.split('\n')[0] : '' }}<br/>
                   {{location.address && location.address.length > 1 ? location.address.split('\n')[1] : '' }}
                   <br/>
-                Phone: {{ location.phone || 'none'}}
+                  <v-btn flat small icon @click="mapShown = true">
+                    <v-icon>map</v-icon>
+                  </v-btn><br/>
+                Phone: {{ location.phone || 'none'}}<br/>
               </v-card-text>
             </v-card>
           </v-flex>
