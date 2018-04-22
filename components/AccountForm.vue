@@ -1,7 +1,8 @@
 <template>
   <div id='regform1'>
     <v-form v-model="valid">
-      <v-radio-group v-model="role.text" :label="role.label" :rules="[rules.required]">
+      {{ role.text }}
+      <v-radio-group v-model="role.text" :label="role.label" :rules="[rules.required]" @change="update">
         <v-layout wrap>
           <v-flex xs4 md3 v-for="o in role.options" :key="o.value">
             <v-radio :label="o.text" :value="o.value" ></v-radio>
@@ -93,6 +94,7 @@ export default {
           { text: 'musician', value: 'musician' },
           { text: 'dancer', value: 'dancer' },
           { text: 'DJ(ane)', value: 'dj' },
+          { text: 'taxi', value: 'taxi' },
           { text: 'other', value: 'other' }
         ]
       },

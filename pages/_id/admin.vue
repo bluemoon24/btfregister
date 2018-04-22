@@ -108,10 +108,21 @@
         return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
       },
       taxilist: function () {
+        console.log('taxilist  1', this.$store.state.eventinfoData)
         let table = this.$store.state.eventinfoData.filter(e => e.type === 'tnt')
-          .map(el => (`${el.starts.replace(' ', '\t ')}\t ${el.location.name}\t ${el.location.address.replace(/\n/g, ', ')}\t` +
-          `${el.targetloc.name}\t ${el.targetloc.address.replace(/\n/g, ', ')}\t` +
-          `${el.involved.filter(e => (e.role !== 'other')).map(e => e.name).join(', ')}`))
+          .map(el => (
+            { date: el.starts.split(' ')[0],
+              time: el.starts.split(' ')[1],
+              from: el.location.name,
+              faddr: el.location.address.replace(/\n/g, ', '),
+              to: el.targetloc.name,
+              taddr: el.targetloc.address.replace(/\n/g, ', '),
+              who: el.involved.filter(e => (e.role !== 'other' && e.role !== 'taxi')).map(e => e.name).join(', '),
+              driver: el.involved.filter(e => (e.role === 'taxi')).map(e => e.name).join(', ')
+            }))
+          .map(e => (`${e.date}\t ${e.time}\t ${e.from}\t ${e.faddr}\t ${e.to}\t ` +
+            `${e.taddr}\t ${e.who}\t ${e.driver}`))
+
         // table.unshift('Date\t Time\t From\t Address\t To\t Address\t Who')
         return table.join('\n')
       },
@@ -190,9 +201,9 @@
       },
 
       save () {
-        // console.log('dispatch', this.editedIndex, this.editedItem)
+        console.log('admin:dispatch', this.editedIndex, this.editedItem)
         if (this.editedIndex > -1) {
-          console.log('dispatch', this.editedItem)
+          console.log('admin:dispatch', this.editedItem)
           this.$store.dispatch('updateGroup', new Group(this.editedItem))
           // Object.assign(this.items[this.editedIndex], this.editedItem)
         } else {
