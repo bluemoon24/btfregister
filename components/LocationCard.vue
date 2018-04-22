@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div max-width="600px">
     <!-- <v-container> -->
       <v-layout column class="mx-0 px-0">
         <v-flex>

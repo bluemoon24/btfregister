@@ -1,13 +1,13 @@
 <template>
   <div>
       <v-layout column>
-        <v-flex class="px-0 mx-0">
+        <v-flex xs12 md6 class="px-0 mx-0">
           <v-card>
             <v-card-title><h2>{{ eventstart }} - {{ eventTypes[eventinfo.type] }} </h2></v-card-title>
             <v-card-text><span><h4>Info</h4> {{eventinfo.evtdescription || 'none'}}</span>
               <h4>{{ eventinfo.type === 'tnt' ? 'From': 'Location' }}</h4>
 
-              <v-flex xs12>
+              <v-flex xs12 md10>
                 <v-expansion-panel popout>
                   <v-expansion-panel-content>
                     <div slot="header">{{eventinfo.location.name}}</div>
@@ -18,8 +18,8 @@
 
               <div v-if="eventinfo.type === 'tnt'">
                 <h4>To:</h4>
-                <v-flex xs12>
-                  <v-expansion-panel popout >
+                <v-flex xs12 md10>
+                  <v-expansion-panel popout>
                     <v-expansion-panel-content class="mx-0 px-0">
                       <div slot="header">{{eventinfo.targetloc.name}}</div>
                       <location-card :location="eventinfo.targetloc"></location-card>
@@ -37,7 +37,7 @@
               </div>
 
               <v-dialog :showMap="true" v-model="mapShown" lazy max-width="650px" v-if="eventinfo.type === 'tnt'">
-                <v-btn v-if="eventinfo.type === 'tnt'" slot="activator" flat small>show route</v-btn>
+                <v-btn v-if="eventinfo.type === 'tnt'" slot="activator" outline flat small>show route</v-btn>
                 <map-dialog :location="eventinfo.location" :target="eventinfo.targetloc" v-on:mapclosed="mapShown = false"/>
               </v-dialog>
 
