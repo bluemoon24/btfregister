@@ -42,7 +42,7 @@
         <td><a :href="'../' + props.item.id">{{ props.item.id }}</a></td>
         <td>{{ props.item.name }}</td>
         <td>{{ props.item.role }}</td>
-        <td><a :href="'mailto:' + props.item.email">{{ props.item.email }}</a></td>
+        <td><a :href="'mailto:' + props.item.email + '?subject=Tango Festival Info&body=' + mailbody(props.item)">{{ props.item.email }}</a></td>
         <td>{{ props.item.mobile }}</td>
         <td class="justify-center layout px-0">
           <v-btn icon class="mx-0" nuxt @click="$router.push('/' + props.item.id + '/eventinfo')">
@@ -134,7 +134,9 @@
         this.items = [
         ]
       },
-
+      mailbody: function (vip) {
+        return `Dear festival friend, %0A%0Afor helping us better organize some festival details, we have created a website.%0A%0AYour personal ID is: ${vip.id}.%0A%0APlease visit this site: http://vip-registration.tangofestival-bonn.de/${vip.id} and follow the instructions.%0A%0ASee you soon at the festival.`
+      },
       createTaxilist: function () {
         console.log('taxilist  1', this.$store.state.eventinfoData)
         if (!this.$store.state.eventinfoData) {

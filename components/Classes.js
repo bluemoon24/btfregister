@@ -123,7 +123,7 @@ export class Performance {
 
 export class Eventinfo {
   constructor (data = null) {
-    console.log('Eventinfo constructor got:', data)
+    // console.log('Eventinfo constructor got:', data)
     if (!data) {
       data = {
         location: {},
@@ -138,7 +138,7 @@ export class Eventinfo {
       }
     }
     clone(this, data, ['id', 'name', 'type', 'level', 'starts', 'ends', 'location', 'targetloc', 'involved', 'key', 'evtdescription'])
-    console.log('Eventinfo constructor cloned', this)
+    // console.log('Eventinfo constructor cloned', this)
     return this
   }
   toNeoProps (lvar = 'e') {

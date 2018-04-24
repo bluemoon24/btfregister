@@ -50,6 +50,7 @@
         item-value="id"
         :label="selectedType === 'tnt' ? 'Pickup location' : 'Target location'"
         ></v-select>
+
         <v-select v-if="selectedType === 'tnt'"
         :items="locations"
         @input="changeTargetLoc"
@@ -58,6 +59,7 @@
         item-value="id"
         label="Select target location"
         ></v-select>
+
         <!-- <v-btn flat small color="primary" >New</v-btn> -->
       </v-flex>
     </v-flex>
@@ -188,10 +190,9 @@
     },
 
     async fetch ({ store }) {
-      console.log('fetch eventlocation', this.eventinfo.id)
+      // console.log('fetch eventlocation', this.eventinfo.id)
       // if (!Array.isArray(this.$store.state.locationData || this.$store.state.locationData.length <= 0)) this.$store.dispatch('getLocationData')
-      // await store.dispatch('getEventLocation', this.eventinfo.id)
-      console.log('**EventId', this.eventinfo)
+      // console.log('**EventId', this.eventinfo)
     },
 
     mounted: function () {
@@ -240,11 +241,11 @@
       changeLocation: function (newval) { this.eventinfo.location = newval },
       changeTargetLoc: function (newval) { this.eventinfo.targetloc = newval },
       changeInvolved: function (newval) {
-        console.log('newval involved', newval)
+        // console.log('newval involved', newval)
         this.eventinfo.involved = newval
       },
       changeStartime: function (newval) {
-        console.log('changeStartime', newval)
+        // console.log('changeStartime', newval)
         this.eventinfo.starts = newval
       },
       changeEndtime: function (newval) { this.eventinfo.ends = newval },
@@ -267,7 +268,7 @@
         return result
       },
       update: function () {
-        console.log('EventinfoForm mounted/updated', this.eventinfo)
+        // console.log('EventinfoForm mounted/updated', this.eventinfo)
         // console.log('json of array', this.eventinfo.involved)
         // console.log('involved', this.eventinfo.involved, Array.isArray(this.eventinfo.involved), typeof this.eventinfo.involved)
         this.selectedLocId = this.eventinfo && this.eventinfo.location ? this.eventinfo.location.id : -1
@@ -318,7 +319,7 @@
         return (Util.isValidDate(d) && pat.test(t)) || 'Invalid date or time'
       },
       startDateEvent: function (e) {
-        console.log('startDateEvent', e)
+        // console.log('startDateEvent', e)
         if (e.type === 'save') {
           this.start_date = e.payload.date
           this.start_time = e.payload.time
@@ -328,7 +329,7 @@
         this.showStartPicker = false
       },
       endDateEvent: function (e) {
-        console.log('endDateEvent', e)
+        // console.log('endDateEvent', e)
         if (e.type === 'save') {
           this.end_date = e.payload.date
           this.end_time = e.payload.time
@@ -345,7 +346,7 @@
       },
       openEndDialog: function () {
         [this.pedate, this.petime] = this.end_datime.split(/\s/)
-        console.log('openEndDialog', this.pedate, this.petime)
+        // console.log('openEndDialog', this.pedate, this.petime)
         // this.petime = this.end_time
         this.showEndPicker = true
       }

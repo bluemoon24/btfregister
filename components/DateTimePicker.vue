@@ -52,7 +52,7 @@
     mounted: function () {
       this.selectedDate = this.date
       this.selectedTime = this.time
-      console.log('mounted DateTimePicker', this.date, this.time)
+      // console.log('mounted DateTimePicker', this.date, this.time)
     },
     watch: {
       'date': 'update',
@@ -77,7 +77,7 @@
         let d = new Date()
         this.selectedDate = Util.formatDateTime(d).date
         this.selectedTime = this.roundTime(d.getHours() + ':' + d.getMinutes())
-        console.log('reset', this.selectedDate)
+        // console.log('reset', this.selectedDate)
       },
       cancel: function () {
         this.$emit('datime', new Tbevent('cancel'))
@@ -87,7 +87,7 @@
           time: this.selectedTime,
           date: this.selectedDate
         }
-        console.log('DateTimePicker submit', this.date, this.time, this.selectedDate + 'T' + this.selectedTime)
+        // console.log('DateTimePicker submit', this.date, this.time, this.selectedDate + 'T' + this.selectedTime)
         // let d = new Date(this.selectedDate + 'T' + this.selectedTime)
         dtinfo.datime = this.selectedDate + ' ' + this.selectedTime
         this.$emit('datime', new Tbevent('save', dtinfo))

@@ -411,21 +411,46 @@ export const actions = {
     await this.dispatch('getEventinfoData')
   },
 
-  // async getAccomodationData ({ commit, state }, uid) {
-  //   console.log('getAccomodationData (from NEO)')
-  //   let statements = {
-  //     statements: [
-  //       { statement: 'MATCH p=(g:Group)-[r:STAYSAT]->(l:Location) where g.id="' + uid + '" RETURN l' }
-  //     ]
-  //   }
-  //   console.log('getAccomodationData statements', statements)
-  //   const { data } = await NEO.post('', statements)
-  //   let results = Util.parseResult(data.results)
-  //   console.log('getAccomodationData results', results[0][0])
-  //   commit('setAccomodationData', results[0][0])
-  // },
-
   async getEventinfoData ({ commit, state }) {
+    let statements = {
+      statements: [
+        { statement: 'MATCH (e:Eventinfo)-[r:INVOLVES|AT|TO]-(l) WITH r,e,l ORDER BY e.starts return type(r) as r, e, l' }
+      ]
+    }
+    console.log('geEventinfoData statements', statements)
+    const { data } = await NEO.post('', statements)
+    let results = Util.parseResult(data.results)
+
+    // console.log('geEventinfoData data.results', data.results)
+    let evtinf = {}
+    for (let result of results[0]) {
+      let id = result.e.id
+      evtinf[id] = evtinf[id] || result.e
+      let evt = evtinf[id]
+      switch (result.r) {
+        case 'AT':
+          evt.location = result.l
+          // console.log('geEventinfoData', result.e.id, result.r, result.l.name)
+          break
+        case 'INVOLVES':
+          evt.involved = evt.involved || []
+          evt.involved.push(result.l)
+          // console.log('geEventinfoData', result.e.id, result.r, result.l.name)
+          break
+        case 'TO':
+          evt.targetloc = result.l
+          // console.log('geEventinfoData', result.e.id, result.r, result.l.name)
+          break
+        default:
+          console.log('geEventinfoData unknown', result.r)
+      }
+    }
+    let evts = Object.values(evtinf).sort((e1, e2) => (e1.starts > e2.starts ? +1 : e1.starts === e2.starts ? 0 : -1))
+    // console.log('geEventinfoData done', evts)
+    commit('setEventinfoData', evts)
+  },
+
+  async getEventinfoDataOld ({ commit, state }) {
     let statements = {
       statements: [
         { statement: 'MATCH (e:Eventinfo) WITH e ORDER BY e.starts RETURN  e' },

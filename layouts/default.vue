@@ -1,4 +1,4 @@
-store.state.uidthis.$store.state.uid<template>
+<template>
   <v-app light>
     <v-navigation-drawer
       :mini-variant.sync="miniVariant"

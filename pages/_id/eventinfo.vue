@@ -1,5 +1,24 @@
 <template>
   <div>
+    <v-container align-content-center>
+    <v-layout column>
+      <v-flex xs12 md8>
+        <v-card>
+          <v-card-title><h2>Important: please check pick-up times</h2></v-card-title>
+          <v-card-text style="font-size: 1.2em">
+            <p>
+            If you are provided taxi fares,
+            please <strong>check your pick-up times</strong>, especially for hotel pick-ups. The current times are tentatively scheduled, but
+            if the taxi organization
+            won't hear anything else from us, they will be there on time and charge us for waiting time.
+          </p>
+          <p>
+             Call <strong>+49 228 282824</strong> to re-schedule <strong>or <a href="mailto:lothar@tangobuehne.de?subject=Please change pick-up time(s)">tell us</a> in advance</strong>, so we can adjust the times.
+          </p>
+            Thanks for cooperation!
+          </v-card-text>
+        </v-card>
+    </v-flex>
     <v-toolbar height="100em">
       <v-flex xs12 class="pr-3">
       <v-text-field
@@ -52,6 +71,8 @@
         slot-scope='props'
       />
     </tb-list>
+  </v-layout>
+</v-container>
   </div>
 </template>
 
@@ -82,6 +103,7 @@
       this.eventinfoList = Array.from(this.$store.state.eventinfoData, (evt) => (new Eventinfo(evt)))
       this.alluids = this.$privileged
       console.log('eventinfolist', this.eventinfoList, this.$store.state.eventinfoData)
+      this.$store.dispatch('getEventinfoData')
     },
     computed: {
       list: function () {
