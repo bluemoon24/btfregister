@@ -145,8 +145,11 @@
         }
         let table = this.$store.state.eventinfoData.filter(e => e.type === 'tnt')
           .map(el => (
-            { date: el.starts.split(' ')[0],
+            { id: el.id,
+              datime: el.starts,
+              date: el.starts.split(' ')[0],
               time: el.starts.split(' ')[1],
+              info: el.evtdescription.replace(/\n/g, ', '),
               from: el.location.name,
               faddr: el.location.address.replace(/\n/g, ', '),
               to: el.targetloc.name,
@@ -154,10 +157,10 @@
               who: el.involved ? el.involved.filter(e => (e && e.role !== 'other' && e.role !== 'taxi')).map(e => e.name).join(', ') : ['none'],
               driver: el.involved ? el.involved.filter(e => (e && e.role === 'taxi')).map(e => e.name).join(', ') : ['none']
             }))
-          .map(e => (`${e.date}\t ${e.time}\t ${e.from}\t ${e.faddr}\t ${e.to}\t ` +
-            `${e.taddr}\t ${e.who}\t ${e.driver}`))
+          .map(e => (`${e.id}\t${e.date}\t${e.time}\t${e.info}\t${e.from}\t${e.faddr}\t${e.to}\t` +
+            `${e.taddr}\t${e.who}\t${e.driver}`))
 
-        // table.unshift('Date\t Time\t From\t Address\t To\t Address\t Who')
+        // table.unshift('ID\t DateTime\t Date\t Time\t From\t Address\t To\t Address\t Who')
         this.tlist = table.join('\n')
         // console.log('taxilist 2', this.tl)
       },

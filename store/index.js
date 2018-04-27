@@ -5,8 +5,10 @@ import Auth from '../mixins/Auth'
 
 Vue.mixin(Auth)
 
+console.log('we run in', process.env.NODE_ENV, 'mode. console output is ', process.env.NODE_ENV === 'production' ? 'off' : 'on')
+
 // let Neo4j = require('simple-neo4j')
-console.log = function () {} // supress console in production
+if (process.env.NODE_ENV === 'production') console.log = function () {} // supress console in production
 
 export const HTTP = {
   get: function (what) {
@@ -21,16 +23,24 @@ export const HTTP = {
   post: function () {}
 }
 
-export const NEO = axios.create({
-  // baseURL: `http://vip-registration.tangofestival-bonn.de/service/`,
-  baseURL: `http://82.165.102.48:7474/db/data/transaction/commit/`, // prod
-  // baseURL: `http://0.0.0.0:7474/db/data/transaction/commit/`, // dev
-  headers: {
-    'Authorization': 'Basic bmVvNGo6Mk1hbnlTZWNyZXRz',
-    'Content-Type': 'application/json; charset=utf-8',
-    'Accept': 'application/json; charset=utf-8'
-  }
-})
+export const NEO = (process.env.NODE_ENV === 'production')
+  ? axios.create({
+    baseURL: `http://82.165.102.48:7474/db/data/transaction/commit/`, // prod
+    headers: {
+      'Authorization': 'Basic bmVvNGo6Mk1hbnlTZWNyZXRz',
+      'Content-Type': 'application/json; charset=utf-8',
+      'Accept': 'application/json; charset=utf-8'
+    }
+  })
+  : axios.create({
+    // baseURL: `http://0.0.0.0:7474/db/data/transaction/commit/`, // dev
+    baseURL: `http://82.165.102.48:7474/db/data/transaction/commit/`, // prod
+    headers: {
+      'Authorization': 'Basic bmVvNGo6Mk1hbnlTZWNyZXRz',
+      'Content-Type': 'application/json; charset=utf-8',
+      'Accept': 'application/json; charset=utf-8'
+    }
+  })
 
 export const state = () => ({
   privileged: false,

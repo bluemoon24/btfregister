@@ -56,7 +56,7 @@
 
           </v-card-text>
           <v-dialog v-if="canshow" max-width="600px">
-            <v-btn slot="activator" outline >My accomodation location</v-btn>
+            <v-btn slot="activator" outline >My accomodation</v-btn>
             <location-card :location="this.accomodation" v-if="canshow"></location-card>
         </v-dialog>
         <v-btn outline :to="'/' + this.$store.state.uid + '/eventinfo'">My timeline</v-btn>

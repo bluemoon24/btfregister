@@ -3,7 +3,8 @@
     <h2>{{ eventstart }} - {{ eventTypes[eventinfo.type] }} </h2>
       <v-layout row wrap>
         <v-flex md6 class="px-0 mx-0">
-          <v-card>
+          <wysiwyg v-model="myHTML" />
+          <!-- <v-card>
             <v-card-text><span><h4>Info</h4> {{eventinfo.evtdescription || 'none'}}</span>
               <h4>{{ eventinfo.type === 'tnt' ? 'From': 'Location' }}</h4>
 
@@ -52,8 +53,7 @@
                     <br/><div style="font-size:1.4em">Driver: {{ taxi.name }}</div>
                   </v-card-text>
                 </v-card>
-              </v-flex>
-
+              </v-flex> -->
           </v-flex>
         </v-layout>
 </div>
@@ -97,7 +97,7 @@
         let taxi = this.eventinfo.involved.filter(e => e.role === 'taxi')
         return taxi ? taxi.map(el => ({name: el.name, phone: el.mobile}))[0] : null
       },
-      involved: function () { return this.eventinfo.involved.map(e => (`${e.name} (${e.mobile})`)).join(', ') },
+      involved: function () { return this.eventinfo.involved.map(e => (e.name)).join(', ') },
       eventstart: function () {
         let d = moment(this.eventinfo.starts.split(/\s|T/).join(' '))
         // console.log('fix 1', this.eventinfo.starts.split(/\s|T/).join(' '), d)
